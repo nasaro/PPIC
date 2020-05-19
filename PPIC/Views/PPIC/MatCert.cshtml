@@ -1,0 +1,519 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+</style>
+
+
+@{
+    ViewBag.Title = "Material Certificated ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Material Certificated</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Material Certificated</h3>
+                        @if (Session["UserNIKLogin"] != null)
+                        {
+                            var codelogin = Session["UserNIKLogin"];
+                            <input type="hidden" class="form-control" id="codecust" name="codecust" value=@codelogin />
+                        }
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#myModal" onclick="addMaterial();"><strong>Add New Certificate</strong></button>
+
+                        </div>
+                    </div>
+
+
+                    <div class="box-body">
+                        <div id="mainform" class="form-horizontal">
+                            <table id="CertInfo" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#aa80ff' style='color:black'>Customer</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>MatCert #</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>Heat #</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>Inv #</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>Upload Date</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>FileName</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>DL</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>DEL</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+       
+   
+
+        <div id="MaterialForm" class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Material Certificate</h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form role="form" enctype="multipart/form-data"  id="fileinfo" name="fileinfo" novalidate>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="empNIK">Employee</label>
+                        <input id="empNIK" type="text" name="empNIK" placeholder="Enter Name customer" class="form-control" autocomplete="off" />
+                        <input type="hidden" id="nik1" name="nik1" />
+
+                    </div>
+                    <div class="form-group">
+                        <label for="Matcode">Material Certificated #</label>
+                        <input type="text" class="form-control" id="Matcode" placeholder="Material Certificated #">
+                    </div>
+                    <div class="form-group">
+                        <label for="invcode">Inv Code</label>
+                        <input type="text" class="form-control" id="invcode" placeholder="Inv Code" autocomplete="off" >
+                    </div>
+                    <div class="form-group">
+                        <label for="heatcode">Heat #</label>
+                        <input type="text" class="form-control" id="heatcode" placeholder="Heat #">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="InputFile">File input</label>
+                        <input type="file" id="InputFile" accept="application/pdf"  data-error="Bruh, that file is invalid"  required >
+                        <p class="help-block with-errors">Must pdf file</p>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <input id="add" type="button" name="add" class=" btn btn-primary input-sm" onclick="saveMaterial();" value="Submit">
+                    <button type="submit" class="btn btn-default" onclick="closeMaterial();">Close</button>
+                </div>
+            </form>
+        </div>
+        <!-- /.box -->
+        <!-- Form Element sizes -->
+
+      
+    </section>
+    <!-- /.content -->
+
+</div>
+<div class="loader"></div>
+@section Scripts
+{ 
+    <script>
+        var urlPPIC = "@Url.Content("~/PPIC")";
+        var id = "";
+        $(document).ready(function () {
+            $('#mydateDelivery').datepicker({
+                format: " dd-MM-yyyy"
+            })
+            MainLoad();
+            $('#MaterialForm').hide();
+
+        })
+
+        function saveMaterial() {
+            var res = validateCert();
+            if (res == false) {
+                return false;
+            }
+
+            var fileUpload = $("#InputFile").get(0);
+            var files = fileUpload.files;
+            var namefile = $('#InputFile').prop("files")[0]['name'];
+            // Create FormData object
+            var fileData = new FormData();
+
+            // Looping over all files and add it to FormData object
+            for (var i = 0; i < files.length; i++) {
+                fileData.append(files[i].name, files[i]);
+            }
+
+            $.ajax({
+                type: "POST",
+                url: urlPPIC + "/UploadFile",
+                data: fileData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert(response);
+                    var empObj = {
+                        CustCode: $('#nik1').val(),
+                        MatCertNo: $('#Matcode').val(),
+                        HeatNo: $('#heatcode').val(),
+                        INVCode: $('#invcode').val(),
+                        FilePath: namefile
+                    };
+                    $.ajax({
+                        url: urlPPIC + "/AddCert",
+                        data: JSON.stringify(empObj),
+                        type: "POST",
+                        contentType: "application/json;charset=utf-8",
+                        dataType: "json",
+                        success: function (result) {
+                            getLoad();
+                        },
+                        error: function (errormessage) {
+                            alert(errormessage.responseText);
+                        }
+                    });
+                    emptyField();
+                },
+                error: function (error) {
+                    alert(error);
+                }
+            });
+
+
+        }
+
+        $(function () {
+            /*----  query level 1 ----*/
+            $("#empNIK").typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1,
+                source: function (request, response) {
+                    $.ajax({
+                        url: urlPPIC + "/ListMemberActive",
+                        data: "{ 'prefix': '" + request + "'}",
+                        dataType: "json",
+                        type: "GET",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            items = [];
+                            map = {};
+                            $.each(data, function (i, item) {
+                                var id = item.CustCode;
+                                var names = item.CustName;
+                                map[names] = { id: id, name: names };
+                                items.push(names);
+                            });
+                            response(items);
+                            $(".dropdown-menu").css("height", "auto");
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                updater: function (item) {
+                    $('#nik1').val(map[item].id);
+                    id = $('#nik1').val();
+                    return item;                   
+                }
+            });
+
+            $("#invcode").typeahead({
+                hint: true,
+                highlight: true,
+                minLength: 1,
+                source: function (request, response) {
+                    $.ajax({
+                        url: urlPPIC + "/ListCert/" + id,
+                        data: "{ 'prefix': '" + request + "'}",
+                        dataType: "json",
+                        type: "GET",
+                        contentType: "application/json; charset=utf-8",
+                        success: function (data) {
+                            itemss = [];
+                            map = {};
+                            $.each(data, function (i, item) {
+                                var nama = item.CustCode;
+                                map[nama] = { id: nama };
+                                itemss.push(nama);
+                            });
+                            response(itemss);
+                            $(".dropdown-menu").css("height", "auto");
+                        },
+                        error: function (response) {
+                            alert(response.responseText);
+                        },
+                        failure: function (response) {
+                            alert(response.responseText);
+                        }
+                    });
+                },
+                updater: function (item) {
+                    $('#invcode').val(map[item].id);
+                    return item;
+                }
+            });
+
+        });
+
+        function emptyField() {
+            $('#empNIK').val('');
+            $('#nik1').val('');
+            $('#Matcode').val('');
+            $('#invcode').val('');
+            $('#heatcode').val('');
+            $('#InputFile').val('');
+        }
+
+        function validateCert() {
+            var isValid = true;
+            if ($('#empNIK').val().trim() == "") {
+                $('#empNIK').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#empNIK').css('border-color', 'lightgrey');
+            }
+
+            if ($('#Matcode').val().trim() == "") {
+                $('#Matcode').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#Matcode').css('border-color', 'lightgrey');
+            }
+
+            if ($('#invcode').val().trim() == "") {
+                $('#invcode').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#invcode').css('border-color', 'lightgrey');
+            }
+
+            if ($('#heatcode').val().trim() == "") {
+                $('#heatcode').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#heatcode').css('border-color', 'lightgrey');
+            }
+
+            if ($('#InputFile').val().trim() == "") {
+                alert('Must File Pdf');
+                isValid = false;
+            }
+            else {
+                $('#InputFile').css('border-color', 'lightgrey');
+            }
+
+            return isValid;
+        }
+
+        function addMaterial() {
+            $('#MaterialForm').show();
+        }
+
+        function closeMaterial() {
+            $('#MaterialForm').hide();
+            emptyField();
+        }
+
+        function MainLoad() {
+            var tr;
+            $.ajax({
+                url: urlPPIC + "/ListAllCertificated/",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td>" + item.CustName + "</td>");
+                        tr.append("<td>" + item.MatCertNo + "</td>");
+                        tr.append("<td>" + item.HeatNo + "</td>");
+                        tr.append("<td>" + item.INVCode + "</td>");
+                        tr.append("<td>" + item.DateUpdate + "</td>");
+                        tr.append("<td>" + item.FilePath + "</td>");
+                        tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Download !"   onclick="getdownfile(\'' + item.FilePath + '\');"><span class="glyphicon glyphicon-download-alt"></span></a></td>');
+                        tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Delete !"   onclick="deleteserver(\'' + item.CustCode + '\',\'' + item.MatCertNo + '\',\'' + item.HeatNo + '\',\'' + item.INVCode + '\',\'' + item.FilePath + '\');"><span class="glyphicon glyphicon-trash"></span></a></td>');
+
+                        $('table').append(tr);
+                    });
+                    $('#CertInfo').DataTable({ responsive: true, });
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                type: 'POST', dataType: 'json'
+            });
+        }
+
+        function Thrash() {
+            var tr;
+            $.ajax({
+                url: urlPPIC + "/Thrash/",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+
+                        var empObj1 = {
+                            CustCode: item.CustCode,
+                            MatCertNo: item.MatCertNo,
+                            HeatNo: item.HeatNo,
+                            INVCode: item.INVCode
+                        };
+                        var empObj2 = { namaFile: item.FilePath }
+
+                        $.ajax({
+                            url: urlPPIC + "/DeleteCert",
+                            data: JSON.stringify(empObj1),
+                            type: "POST",
+                            contentType: "application/json;charset=utf-8",
+                            dataType: "json",
+                            success: function (result) {
+                                if (result > 0) {
+                                    BootstrapAlert.alert({
+                                        title: "Message",
+                                        message: "File Delete Successfull..."
+                                    });
+                                }
+                            },
+                            error: function (errormessage) {
+                                alert(errormessage.responseText);
+                            }
+                        });
+
+
+                        $.ajax({
+                            url: urlPPIC + "/deleteFileServer",
+                            data: JSON.stringify(empObj2),
+                            type: "POST",
+                            contentType: "application/json;charset=utf-8",
+                            dataType: "json",
+                            success: function (result) {
+                                alert(result);
+                            },
+                            error: function (errormessage) {
+                                alert(errormessage.responseText);
+                            }
+                        });
+
+
+                    });
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                type: 'POST', dataType: 'json'
+            });
+        }
+
+
+        function getdownfile(pdfFileName) {
+            var link = '@Url.Action("GetPdf", "PPIC", new { fileName = "-1" })';
+            link = link.replace("-1", pdfFileName);
+            window.open(link);
+        }
+
+        function deleteserver(cust, mat, heat, inv, nameFile) {
+            var empObj = { namaFile: nameFile }
+      
+            $.ajax({
+                url: urlPPIC + "/deleteFileServer",
+                data: JSON.stringify(empObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    alert(result);
+                    deletefile(cust, mat, heat, inv, nameFile);
+                    getLoad();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function deletefile(cust, mat, heat, inv, nameFile) {
+            var empObj = {
+                CustCode: cust,
+                MatCertNo: mat,
+                HeatNo: heat,
+                INVCode: inv
+            };
+            $.ajax({
+                url: urlPPIC + "/DeleteCert",
+                data: JSON.stringify(empObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    if (result > 0) {
+                        BootstrapAlert.alert({
+                            title: "Message",
+                            message: "File Delete Successfull..."
+                        });
+                    }
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+
+        function getLoad() {
+            var dataTable = $('#CertInfo').DataTable();
+            var tr;
+            $.ajax({
+                url: urlPPIC + "/ListAllCertificated/",
+                success: function (result) {
+                    dataTable.clear();
+                    $.each(result, function (key, item) {
+                        dataTable.row.add([
+                            item.CustName,
+                            item.MatCertNo,
+                            item.HeatNo,
+                            item.INVCode,
+                            item.DateUpdate,
+                            item.FilePath,
+                            '<a href="javascript:void(0)"  data-toggle="tooltip" title="Download !"   onclick="getdownfile(\'' + item.FilePath + '\');"><span class="glyphicon glyphicon-download-alt"></span></a>',
+                            '<a href="javascript:void(0)"  data-toggle="tooltip" title="Delete !"   onclick="deleteserver(\'' + item.CustCode + '\',\'' + item.MatCertNo + '\',\'' + item.HeatNo + '\',\'' + item.INVCode + '\',\'' + item.FilePath + '\');"><span class="glyphicon glyphicon-trash"></span></a>'
+                        ]).draw();
+
+                    });
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                type: 'POST', dataType: 'json'
+            });
+        }
+
+    </script>
+}

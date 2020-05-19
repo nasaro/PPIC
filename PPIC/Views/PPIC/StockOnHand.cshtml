@@ -1,0 +1,218 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+</style>
+
+@{
+    ViewBag.Title = "PPIC Application";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Stock On Hand Product</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title" style="color:blue">Stock On Hand Product</h3>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#myModal" onclick="refreshStock();"><strong>Refresh</strong></button>
+                        </div>
+                    </div>
+
+                    <div class="box-body">
+                        <div id="mainform" class="form-horizontal">
+                            <table id="tblStock" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#aa80ff' style='color:black'>ID</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>NAME</th>
+                                        <th bgcolor='#aa80ff' style='color:black'><span class='pull-right'>STOCK</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodytblStock"></tbody>
+                            </table>
+                        </div>
+                        <br />
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+
+</div>
+
+<div class="loader"></div>
+
+<!-- /.content-wrapper -->
+@section Scripts
+{
+    <script>
+        var urlPPIC = "@Url.Content("~/PPIC")";
+        $(document).ready(function () {
+            MainLoad();
+        })
+
+        function MainLoad() {
+            var tr;
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+
+            var yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+            var todayDate = dd + '/' + mm + '/' + yyyy;
+
+
+            var ppicObj = {
+                TGL: todayDate
+            };
+
+            $.ajax({
+                url: urlPPIC + "/getStockOnHand/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td>" + item.ID + "</td>");
+                        tr.append("<td>" + item.Name + "</td>");
+                        tr.append("<td><span class='pull-right'>" + formatNumber(item.calibrate) + "</span></td>");
+                        $('#tblStock').append(tr);
+                    });
+
+                    $('#tblStock').DataTable({
+
+                        dom: 'Bfrtip',
+                        lengthMenu: [
+                                [10, 25, 50, -1],
+                                ['10 rows', '25 rows', '50 rows', 'Show all']
+                        ],
+                        buttons: ['pageLength', {
+                            extend: 'excel',
+                            text: 'Export to Excel(All)',
+                            exportOptions: {
+                                modifier: {
+                                    // DataTables core
+                                    order: 'index',  // 'current', 'applied', 'index',  'original'
+                                    page: 'all',      // 'all',     'current'
+                                    search: 'none'     // 'none',    'applied', 'removed'
+                                }
+                            }
+                        }, {
+                            extend: 'excel',
+                            text: 'Export to Excel(Part)',
+                            exportOptions: {
+                                modifier: {
+                                    // DataTables core
+                                    order: 'index',  // 'current', 'applied', 'index',  'original'
+                                    page: 'current',      // 'all',     'current'
+                                    search: 'applied'     // 'none',    'applied', 'removed'
+                                }
+                            }
+                        },
+
+                        ],
+                    });
+
+
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function refreshStock() {
+            var tr;
+            $('#tbodytblStock').empty();
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+
+            var yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+            var todayDate = dd + '/' + mm + '/' + yyyy;
+
+
+            var ppicObj = {
+                TGL: todayDate
+            };
+
+            $.ajax({
+                url: urlPPIC + "/getStockOnHand/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td>" + item.ID + "</td>");
+                        tr.append("<td>" + item.Name + "</td>");
+                        tr.append("<td><span class='pull-right'>" + formatNumber(item.calibrate) + "</span></td>");
+                        $('#tblStock').append(tr);
+
+                    });
+
+                  
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+
+        }
+    </script>
+}

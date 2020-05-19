@@ -1,0 +1,648 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+</style>
+
+
+@{
+    ViewBag.Title = "OutStanding Purchase Order";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Outstanding Purchase Order</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Outstanding Purchase Order</h3>
+                        @if (Session["UserNIKLogin"] != null)
+                        {
+                            var codelogin = Session["UserNIKLogin"];
+                            <input type="hidden" class="form-control" id="codecust" name="codecust" value=@codelogin />
+                        }
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="mainform" class="form-horizontal">
+                            <table id="POInfo" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#aa80ff' style='color:black'>PO #</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>PO Date</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>Customer</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>Est.DD</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <br />
+
+                        <div id="utama" class="form-horizontal">
+                            <div class="form-group has-feedback">
+                                <input type="text" id="myInput" class="form-control" onkeyup="autosearch()" placeholder="Search">
+                                <span class=" glyphicon glyphicon-search form-control-feedback"></span>
+                            </div>
+                            <label>Detail Purchase Order</label>
+                            <table id="PODetails" class="table table-bordered  table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#009933' style="color:white">Item Name</th>
+                                        <th bgcolor='#009933' style="color:white">Order Qty</th>
+                                        <th bgcolor='#009933' style="color:white">Delivery Qty</th>
+                                        <th bgcolor='#009933' style="color:white">Balance Qty</th>
+                                        <th bgcolor='#009933' style="color:white">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+        <!--Form myModalDetail-->
+        <div class="modal fade" id="myModalDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header alert-success">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabel">Delivery</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label for="socode">SO Code</label>
+                                    </div> 
+                                    <div class="col-sm-8">
+                                        <input type="hidden" class="form-control" id="custcode" disabled="disabled" />
+                                        <input type="text" class="form-control" id="socode" disabled="disabled" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label for="pocode">PO Code</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="pocode" disabled="disabled" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label for="invcode">Item Code</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="invcode" disabled="disabled" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label for="mydateDelivery">Delivery Date</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div id="mydateDelivery1">
+                                            <div class="input-group date">
+                                                <input type="text" class="form-control pull-right" id="mydateDelivery" placeholder="Delivery Date">
+                                                <div class="input-group-addon">
+                                                    <i class="fa fa-calendar"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <label for="qty">Qty</label>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="number" id="qty" name="qty" class="form-control" placeholder="Delivery Qty" />
+                                        <input type="hidden" id="qtycomp" name="qtycomp" class="form-control" placeholder="Delivery Qty" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btnAddDelivery"  onclick="SaveDelivery();">Save</button>
+                        <button type="button" class="btn btn-primary" id="btnUpdateDelivery" onclick="UpdateDelivery();">Update</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>   <!--End myModalDetail-->
+
+        <!--Form myModalList-->
+        <div class="modal fade" id="myModalList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header alert-success">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabelList">Delivery</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div id="ShipList" class="form-horizontal">
+                                <table id="ListDetails" class="table table-bordered  table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th bgcolor='#aa80ff' style="color:white">No</th>
+                                            <th bgcolor='#aa80ff' style="color:white">Delivery Date</th>
+                                            <th bgcolor='#aa80ff' style="color:white">Qty</th>
+                                            <th bgcolor='#aa80ff' style="color:white">Update</th>
+                                            <th bgcolor='#aa80ff' style="color:white">Delete</th>
+                                            <th bgcolor='#aa80ff' style="color:white">Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyList"></tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>   <!--End myModalList-->
+    
+        <!--Form myModalEmail-->
+        <div class="modal fade" id="myModalEmail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header alert-success">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabelEmail">Email</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div id="EmailBody" class="form-horizontal">
+                                <div class="col-md-12">
+                                    <div class="box box-primary">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Compose New Message</h3>
+                                        </div>
+                                        <!-- /.box-header -->
+                                        <div class="box-body">
+                                            <div class="form-group">
+                                                <input id="toEmail" class="form-control" value="ict@allmart-precision.com" placeholder="To:" disabled="disabled">
+                                            </div>
+                                            <div class="form-group">
+                                                <input id="toSubject" class="form-control" placeholder="Subject:"  disabled="disabled">
+                                            </div>
+                                            <div class="form-group">
+                                                <textarea id="compose-textarea" class="form-control" style="height: 200px">
+                                                </textarea>
+                                            </div>                                           
+                                        </div>
+                                        <!-- /.box-body -->
+                                        <div class="box-footer">
+                                            <div class="pull-right">
+                                                <button type="submit" class="btn btn-primary" onclick="OKSend()"><i class="fa fa-envelope-o"></i> Send</button>
+                                            </div>
+                                        </div>
+                                        <!-- /.box-footer -->
+                                    </div>
+                                    <!-- /. box -->
+                                </div>
+                                <!-- /.col -->
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>   <!--End myModalEmail-->
+    
+    </section>
+    <!-- /.content -->
+
+</div>
+<div class="loader"></div>
+
+<!-- /.content-wrapper -->
+
+@section Scripts
+{
+
+    <script>
+       var urlPPIC = "@Url.Content("~/PPIC")";
+        $(document).ready(function () {
+            $('#mydateDelivery').datepicker({
+                format: " dd-MM-yyyy"
+            })
+            MainLoad();
+           $('#utama').hide();
+       })
+
+       function MainLoad() {
+           var ID = $('#codecust').val();
+           var tr;
+           $.ajax({
+               url: urlPPIC + "/ViewPOH/" + ID,
+               success: function (result) {
+                   $.each(result, function (key, item) {
+                       tr = $('<tr/>');
+                       tr.append("<td><strong>" + item.PO + "</strong></td>");
+                       tr.append("<td>" + item.Date + "</td>");
+                       tr.append("<td>" + item.Customer + "</td>");
+                       tr.append("<td>" + item.EDDate + "</td>");
+                       tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Details...!" onclick="Details(\'' + item.KodeCustomer + '\',\'' + item.SO + '\',\'' + item.PO + '\');"><span class="glyphicon glyphicon-th-list"></span></a></td>');
+                       $('table').append(tr);
+                   });
+                   $('#POInfo').DataTable({ responsive: true, });
+               },
+               error: function (errormessage) {
+                   alert(errormessage.responseText);
+                },
+               beforeSend: function () {  $(".loader").show(); },
+               complete: function () { $(".loader").hide(); },
+               type: 'POST', dataType: 'json'
+           });
+       }
+
+
+       function Details(cust, code, codepo) {
+           $('#utama').show();
+           $('#PODetails').empty();
+           var htmm = '<label style="color:red" >Purchase Order #   ' + codepo + '</label>';
+           $(htmm).appendTo("#PODetails");
+           $.ajax({
+               url: urlPPIC + "/ViewPOD",
+               data: JSON.stringify({ 'ID': code, }),
+               type: "POST",
+               contentType: "application/json;charset=utf-8",
+               beforeSend: function () { $(".loader").show(); },
+               complete: function () { $(".loader").hide();; },
+               dataType: "json",
+               success: function (result) {
+                   var html = "<thead><tr><th bgcolor='#009933' style='color:white'>Item Name</th><th bgcolor='#009933' style='color:white'><span class='pull-right'>Order Qty</span></th><th bgcolor='#009933' style='color:white'><span class='pull-right'>Delivery Qty</span></th><th bgcolor='#009933' style='color:white'><span class='pull-right'>Balance Qty</span></th><th bgcolor='#009933' style='color:white'><span class='pull-right'>Action</span></th><th bgcolor='#009933' style='color:white'><span class='pull-right'>List</span></th></tr></thead><tbody></tbody>"
+                   $(html).appendTo("#PODetails");
+                   $.each(result, function (key, item) {
+                       if (item.QtySisa > 0) {
+                           var newRow =
+                               "<tr>"
+                            + "<td><strong>" + item.NameProduct + "</strong></td>"
+                            + "<td><strong><span class='pull-right'>" + formatNumber(item.QtyOrder) + "</span></strong></td>"
+                            + "<td><strong><span class='pull-right'>" + formatNumber(item.QtyDelivery) + "</span></strong></td>"
+                            + "<td><strong><span class='pull-right'>" + formatNumber(item.QtySisa) + "</span></strong></td>"
+                            + '<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Delivery" onclick="InputDelivery(\'' + cust + '\',\'' + code + '\',\'' + codepo + '\',\'' + item.KodeProduct + '\',' + item.QtySisa + ');"><span class="pull-right glyphicon glyphicon-shopping-cart"></span></a></td>'
+                            + '<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Show Plan" onclick="ShowPlan(\'' + cust + '\',\'' + code + '\',\'' + codepo + '\',\'' + item.KodeProduct + '\',\'' + item.NameProduct + '\',' + item.QtySisa + ');"><span class="pull-right glyphicon glyphicon-th-list"></span></a></td>'
+                            + "</tr>";
+                       }
+                       else {
+                           var newRow =
+                               "<tr>"
+                            + "<td><strong>" + item.NameProduct + "</strong></td>"
+                            + "<td><strong><span class='pull-right'>" + formatNumber(item.QtyOrder) + "</span></strong></td>"
+                            + "<td><strong><span class='pull-right'>" + formatNumber(item.QtyDelivery) + "</span></strong></td>"
+                            + "<td><strong><span class='pull-right'>" + formatNumber(item.QtySisa) + "</span></strong></td>"
+                            + "</tr>";
+                       }
+                       $(newRow).appendTo("#PODetails");
+                    })
+                },
+               error: function (errormessage) {
+                   alert(errormessage.responseText);
+               }
+           });
+       }
+
+       function InputDelivery(cust, so, po, codeProd, sisa) {
+           $('#custcode').val(cust);
+           $('#socode').val(so);
+           $('#pocode').val(po);
+           $('#invcode').val(codeProd);
+           $('#qty').val(sisa);
+           $('#qtycomp').val(sisa);
+           $('#myModalDetail').modal('show');
+           $('#btnAddDelivery').show();
+           $('#btnUpdateDelivery').hide();
+
+       }
+
+       function ShowAgain(cust, so, po, codeProd, nameItem) {
+           var tr;
+           var nom = 1;
+           var namabt = 'editDel'
+           var namanewbt;
+           $('#tbodyList').empty();
+           var ppicObj = {
+               Cust: cust,
+               PO: po,
+               SO: so,
+               Inv: codeProd
+           };
+           $.ajax({
+               url: urlPPIC + "/ViewPlan/",
+               data: JSON.stringify(ppicObj),
+               type: "POST",
+               contentType: "application/json;charset=utf-8",
+               beforeSend: function () { $(".loader").show(); },
+               complete: function () { $(".loader").hide();; },
+               dataType: "json",
+               success: function (result) {
+                   $.each(result, function (key, item) {
+                       namanewbt = namabt + nom;
+                       tr = $('<tr/>');
+                       tr.append("<td>" + nom + "</td>");
+                       tr.append("<td>" + item.DATEDelivery + "</td>");
+                       tr.append("<td> <input type='number' id='" + namanewbt + "' class='form-control' value=\'" + item.QTYDelivery + "\'/></td>");
+                       tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Update" onclick="UpdateItem(\'' + cust + '\',\'' + po + '\',\'' + so + '\',\'' + item.DATEDelivery + '\',\'' + codeProd + '\',\'' + nameItem + '\',' + item.QTYDelivery + ',' + nom + ')"><span class="glyphicon glyphicon-floppy-saved"></span></a></td>');
+                       tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Delete" onclick="DeleteItem(\'' + cust + '\',\'' + po + '\',\'' + so + '\',\'' + item.DATEDelivery + '\',\'' + codeProd + '\',\'' + nameItem + '\')"><span class="glyphicon glyphicon-trash"></span></a></td>');
+                       tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Email" onclick="Send(\'' + cust + '\',\'' + po + '\',\'' + so + '\',\'' + item.DATEDelivery + '\',\'' + codeProd + '\',\'' + nameItem + '\',' + item.QTYDelivery + ')"><span class="glyphicon glyphicon-send"></span></a></td>');
+                       tr.append('</tr>');
+                       $('#tbodyList').append(tr);
+                       nom++;
+                   });
+               },
+               error: function (errormessage) {
+                   alert(errormessage.responseText);
+               }
+           });
+       }
+
+       function ShowPlan(cust, so, po, codeProd, nameItem, sisa) {
+           $('#myModalList').modal('show');
+           var tr;
+           var nom = 1;
+           var namabt = 'editDel'
+           var namanewbt;
+           $('#tbodyList').empty();
+           var ppicObj = {
+               Cust: cust,
+               PO: po,
+               SO: so,
+               Inv: codeProd
+           };
+           $.ajax({
+               url: urlPPIC + "/ViewPlan/",
+               data: JSON.stringify(ppicObj),
+               type: "POST",
+               contentType: "application/json;charset=utf-8",
+               beforeSend: function () { $(".loader").show(); },
+               complete: function () { $(".loader").hide();; },
+               dataType: "json",
+               success: function (result) {
+                   $.each(result, function (key, item) {
+                       namanewbt = namabt + nom;
+                       tr = $('<tr/>');
+                       tr.append("<td>" + nom + "</td>");
+                       tr.append("<td>" + item.DATEDelivery + "</td>");
+                       tr.append("<td> <input type='number' id='" + namanewbt + "' class='form-control' value=\'" + item.QTYDelivery + "\'/></td>");
+                       tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Update" onclick="UpdateItem(\'' + cust + '\',\'' + po + '\',\'' + so + '\',\'' + item.DATEDelivery + '\',\'' + codeProd + '\',\'' + nameItem + '\',' + item.QTYDelivery + ',' + nom + ')"><span class="glyphicon glyphicon-floppy-saved"></span></a></td>');
+                       tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Delete" onclick="DeleteItem(\'' + cust + '\',\'' + po + '\',\'' + so + '\',\'' + item.DATEDelivery + '\',\'' + codeProd + '\',\'' + nameItem + '\')"><span class="glyphicon glyphicon-trash"></span></a></td>');
+                       tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Email" onclick="Send(\'' + cust + '\',\'' + po + '\',\'' + so + '\',\'' + item.DATEDelivery + '\',\'' + codeProd + '\',\'' + nameItem + '\',' + item.QTYDelivery + ')"><span class="glyphicon glyphicon-send"></span></a></td>');
+                       tr.append('</tr>');
+                       $('#tbodyList').append(tr);
+                       nom++;
+                   });
+               },
+               error: function (errormessage) {
+                   alert(errormessage.responseText);
+               }
+           });
+       }
+
+       function Send(cust, so, po, tgl, codeProd, nameItem, sisa) {
+           var dataSubject = 'Reschedule PO# ' + po + ' ' + nameItem;
+           var dataArea = 'Item: '+ nameItem +' \r Qty:'+ sisa + ' \r Date:'+tgl + '\r \r Please Reschedule To: ';
+           $('#toSubject').val(dataSubject);
+           $('#compose-textarea').val(dataArea);
+           $('#myModalEmail').modal('show');
+       }
+
+       function OKSend() {
+           var ppicObj = {
+               ToEmail: $('#toEmail').val(),
+               EmailSubject: $('#toSubject').val(),
+               EMailBody: $('#compose-textarea').val()
+           };
+           $.ajax({
+               url: urlPPIC + "/SendEmail/",
+               data: JSON.stringify(ppicObj),
+               type: "POST",
+               contentType: "application/json;charset=utf-8",
+               beforeSend: function () { $(".loader").show(); },
+               complete: function () { $(".loader").hide();; },
+               dataType: "json",
+               success: function (result) {
+                   BootstrapAlert.success({
+                       title: "Message",
+                       message: "Send Successfull..."
+                   });
+
+               },
+               error: function (errormessage) {
+                    @ViewBag.Status;
+                   //alert(errormessage.responseText);
+               }
+           });
+       }
+
+        function DeleteItem(cust, po, so, tgl, codeProd, nameItem) {
+           var ppicObj = {
+               CustCode: cust,
+               POCode: po,
+               SOCode: so,
+               INVCode: codeProd,
+               DATEDelivery: tgl
+           };
+
+           $.ajax({
+               url: urlPPIC + "/DeletePlan",
+               data: JSON.stringify(ppicObj),
+               type: "POST",
+               contentType: "application/json;charset=utf-8",
+               dataType: "json",
+               success: function (result) {
+                   if (result > 0) {
+                       BootstrapAlert.success({
+                           title: "Message",
+                           message: "Delete Delivery Detail Successfull..."
+                       });
+                       ShowAgain(cust, so, po, codeProd, nameItem);
+                   } else {
+                       BootstrapAlert.alert({
+                           title: "Message",
+                           message: "Delete Delivery Detail Failed..."
+                       });
+
+                   }
+               },
+               error: function (errormessage) {
+                   alert(errormessage.responseText);
+               }
+           });
+
+       }
+
+        function UpdateItem(cust, po, so, tgl, codeProd, nameItem, qty, nom) {
+
+           var ppicObj = {
+               CustCode: cust,
+               POCode: po,
+               SOCode: so,
+               INVCode: codeProd,
+               DATEDelivery: tgl,
+               QTYDelivery: $('#editDel'+nom).val()
+           };
+
+           $.ajax({
+               url: urlPPIC + "/UpdatePlan",
+               data: JSON.stringify(ppicObj),
+               type: "POST",
+               contentType: "application/json;charset=utf-8",
+               dataType: "json",
+               success: function (result) {
+                   if (result > 0) {
+                       BootstrapAlert.success({
+                           title: "Message",
+                           message: "Update Delivery Detail Successfull..."
+                       });
+                       ShowAgain(cust, so, po, codeProd, nameItem);
+                   } else {
+                       BootstrapAlert.alert({
+                           title: "Message",
+                           message: "Update Delivery Detail Failed..."
+                       });
+
+                   }
+               },
+               error: function (errormessage) {
+                   alert(errormessage.responseText);
+               }
+           });
+
+
+       }
+
+
+       function SaveDelivery() {
+           var nilqty1 =  parseInt($('#qty').val());
+           var nilqty2 =  parseInt($('#qtycomp').val());
+           var nilsocode = $('#socode').val();
+           var nilpocode = $('#pocode').val();
+           var nilinvcode = $('#invcode').val();
+           var nilcust = $('#custcode').val();
+
+           if (nilqty1 > nilqty2) {
+               BootstrapAlert.alert({
+                   title: "Message",
+                   message: "Greater Than " + nilqty2 + "..!"
+               });
+               $('#myModalDetail').modal('show');
+           }
+           else {
+               $('#myModalDetail').modal('hide');
+               var ppicObj = {
+                   CustCode: $('#custcode').val(),
+                   POCode: $('#pocode').val(),
+                   SOCode: $('#socode').val(),
+                   INVCode: $('#invcode').val(),
+                   DATEDelivery: $('#mydateDelivery').val(),
+                   QTYDelivery: $('#qty').val()
+               };
+
+               $.ajax({
+                   url: urlPPIC + "/AddPlan",
+                   data: JSON.stringify(ppicObj),
+                   type: "POST",
+                   contentType: "application/json;charset=utf-8",
+                   dataType: "json",
+                   success: function (result) {
+                       if (result > 0) {
+                           BootstrapAlert.success({
+                               title: "Message",
+                               message: "Add Delivery Detail Successfull..."
+                           });
+                           
+                       } else {
+                           BootstrapAlert.alert({
+                               title: "Message",
+                               message: "Add Delivery Detail Failed..."
+                           });
+
+                       }
+                   },
+                   error: function (errormessage) {
+                       alert(errormessage.responseText);
+                   }
+               });
+           }
+       }
+
+
+       function autosearch() {
+           var input, filter, table, tr, td, i;
+           input = document.getElementById("myInput");
+           filter = input.value.toUpperCase();
+           table = document.getElementById("PODetails");
+           tr = table.getElementsByTagName("tr");
+           for (i = 0; i < tr.length; i++) {
+               td = tr[i].getElementsByTagName("td")[0];
+               if (td) {
+                   if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                       tr[i].style.display = "";
+                   } else {
+                       tr[i].style.display = "none";
+                   }
+               }
+           }
+       }
+
+       function formatNumber(num) {
+           return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+
+       }
+
+    </script>
+
+}
+

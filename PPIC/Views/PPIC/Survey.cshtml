@@ -1,0 +1,471 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+
+
+
+    .cornersL {
+        border-radius: 15px 5px 1px 1px;
+        background: #73AD21;
+        padding: 5px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .cornersR {
+        border-radius: 5px 15px 1px 1px;
+        background: #73AD21;
+        padding: 5px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .cart {
+        height: 525px;
+        padding: 10px;
+        border: solid 0.5px silver;
+    }
+
+    .cart-tbl {
+        height: 525px;
+        border-radius: 10px;
+        background: #e3f2e4;
+        overflow: auto;
+    }
+
+    .gtext {
+        color: blue;
+        text-shadow: 2px 2px 4px blue;
+        font-size: 110%;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+
+    .modal-dialog {
+        width: 80%;
+        margin: auto;
+    }
+</style>
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Survey</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Survey</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#myModal" onclick="addSurvey();"><strong>Add Survey</strong></button>
+                        </div>
+                    </div>
+
+
+                    <div class="box-body cart">
+                        <div id="mainform" class="form-horizontal cart-tbl">
+                            <table id="tblSurvey" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="cornersL" style='color:black; width:10%'>id</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Start</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Stop</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Status</th>
+                                        <th class="cornersR" style='color:black; width:10%'>Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodytblSurvey"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+
+
+        <div id="SurveyForm" class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title" style="color:red"><strong>Survey</strong></h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form role="form" enctype="multipart/form-data" id="SurveyInfo" name="SurveyInfo" novalidate>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="surveyID">ID</label>
+                        <input type="text" class="form-control" id="surveyID" disabled="disabled" />
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group date datetimepicker">
+                            <label for="dStart">Date Start</label>
+                            <input type="text" class="form-control" id="dStart" placeholder="Date Start" />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <div class="input-group date datetimepicker">
+                                <label for="dStop">Date Finish</label>
+                                <input type="text" class="form-control" id="dStop" placeholder="Date Finish" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select class="selectpicker form-control" id="status" placeholder="Select Status">
+                            <option disabled selected value=""> -- select an option -- </option>
+                            <option value="C">CLOSE</option>
+                            <option value="O">OPEN</option>
+                        </select>
+
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <input id="btnAdd" type="button" name="add" class=" btn btn-primary input-sm" onclick="saveSurvey();" value="Submit">
+                    <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="UpdateSurvey();">Update</button>
+                    <button type="submit" class="btn btn-default" onclick="closeSurvey();">Close</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="detailForm" class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title" style="color:red"><strong>Survey</strong></h3>
+            </div>
+            <!-- /.box-header -->
+        
+            <div id="cusform" class="form-horizontal">
+                <table id="tblCustomer" class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th bgcolor='#73AD21' style='color:black'>ID SURVEY</th>
+                            <th bgcolor='#73AD21' style='color:black'>DATE</th>
+                            <th bgcolor='#73AD21' style='color:black'>CUSID</th>
+                            <th bgcolor='#73AD21' style='color:black'>NAME</th>
+                            <th bgcolor='#73AD21' style='color:black'>SCORE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodytblCustomer"></tbody>
+                </table>
+                <span id="jumlah" style="font-size:medium">Rate Score=  </span><span style="color:red;font-size:medium" id="score"></span>
+            </div>
+        </div>
+
+
+
+    </section>
+    <!-- /.content -->
+</div>
+<div class="loader"></div>
+@section Scripts
+{
+    <script>
+        var urlPPIC = "@Url.Content("~/PPIC")";
+        var nomer;
+        var rata, sumrata;
+        $(document).ready(function () {
+            $('#dStart').datepicker({
+                format: "dd-mm-yyyy"
+            });
+            $('#dStop').datepicker({
+                format: "dd-mm-yyyy"
+            });
+            MainLoad();
+            $('#SurveyForm').hide();
+            $('#detailForm').hide();
+            
+        })
+
+        function MainLoad() {
+            var tr;
+            var ppicObj = {
+                id: 0,
+                ch: 'A'
+            };
+            $.ajax({
+                url: urlPPIC + "/ViewSurvey/",
+                data: JSON.stringify(ppicObj),
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td class='gtext'>" + item.id + "</td>");
+                        tr.append("<td class='gtext'>" + item.dateStart + "</td>");
+                        tr.append("<td class='gtext'>" + item.dateStop + "</td>");
+                        if (item.status=="O")
+                          tr.append("<td class='gtext'>" + "OPEN" + "</td>");
+                        else tr.append("<td class='gtext'>" + "CLOSE" + "</td>");
+                        tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Edit !"     onclick="getSurvey(' + item.id + ');"><span class="glyphicon glyphicon-pencil"></span></a></td>');
+                        $('#tblSurvey').append(tr);
+                    });
+                    var masterTable = $('#tblSurvey').DataTable();
+                    $('#tblSurvey tbody').on('click', 'tr', function () {
+                        var data = masterTable.row(this).data();
+                        viewSurveyCustomer(data[0]);
+                    });
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                type: 'POST', dataType: 'json'
+            });
+        }
+
+        function viewSurveyCustomer(id) {
+            var tr;
+            var ppicObj = {
+                id: id
+            };
+            nomer = 0;
+            sumrata = 0
+            $('#tbodytblCustomer').empty();
+            $.ajax({
+                url: urlPPIC + "/ViewSurveyDetail/",
+                data: JSON.stringify(ppicObj),
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');                        
+                        tr.append("<td>" + item.id + "</td>");
+                        tr.append("<td>" + item.dateSurvey + "</td>");                        
+                        tr.append("<td>" + item.cusid + "</td>");
+                        tr.append("<td>" + item.cusname + "</td>");
+                        tr.append("<td>" + item.rate + "</td>");
+                        $('#tblCustomer').append(tr);
+                        sumrata = sumrata + item.rate;
+                        nomer++;
+                    });
+                    if (nomer>0)
+                        rata = sumrata / nomer;
+                    else rata=0
+                    $('#score').text(rata);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                type: 'POST', dataType: 'json'
+            });
+            
+            $('#SurveyForm').hide();
+            $('#detailForm').show();
+        }
+
+        function getLoad() {
+            var tr;
+            $('#tbodytblSurvey').empty();
+            var ppicObj = {
+                id: 0,
+                ch: 'A'
+            };
+            $.ajax({
+                url: urlPPIC + "/ViewSurvey/",
+                data: JSON.stringify(ppicObj),
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td class='gtext'>" + item.id + "</td>");
+                        tr.append("<td class='gtext'>" + item.dateStart + "</td>");
+                        tr.append("<td class='gtext'>" + item.dateStop + "</td>");
+                        if (item.status == "O")
+                            tr.append("<td class='gtext'>" + "OPEN" + "</td>");
+                        else tr.append("<td class='gtext'>" + "CLOSE" + "</td>");
+                        tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Edit !"     onclick="getSurvey(' + item.id + ');"><span class="glyphicon glyphicon-pencil"></span></a></td>');
+                        $('#tblSurvey').append(tr);
+                    });
+                    var masterTable = $('#tblSurvey').DataTable();
+                    $('#tblSurvey tbody').on('click', 'tr', function () {
+                        var data = masterTable.row(this).data();
+                        viewSurveyCustomer(data[0]);
+                    });
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                type: 'POST', dataType: 'json'
+            });
+        }
+
+        function addSurvey() {
+            $('#SurveyForm').show();
+            $('#btnUpdate').hide();
+            $('#btnAdd').show();
+            emptySurvey();
+        }
+
+        function getSurvey(id) {
+            var ppicObj = {
+                id: id,
+                ch: 'I'
+            };
+            $.ajax({
+                url: urlPPIC + "/ViewSurvey/",
+                data: JSON.stringify(ppicObj),
+                contentType: "application/json;charset=utf-8",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        $('#surveyID').val(item.id);
+                        $('#dStart').val(item.dateStart);
+                        $('#dStop').val(item.dateStop);
+                        $('#status').val(item.status)
+
+                    });
+                    $('#SurveyForm').show();
+                    $('#detailForm').hide();
+                    $('#btnUpdate').show();
+                    $('#btnAdd').hide();
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                },
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                type: 'POST', dataType: 'json'
+            });
+
+        }
+
+        function UpdateSurvey() {
+            var res = validateSurvey();
+            if (res == false) {
+                return false;
+            }
+            var ppicObj = {
+                id: $('#surveyID').val(),
+                dateStart: $('#dStart').val(),
+                dateStop: $('#dStop').val(),
+                status: $('#status').val(),
+                ch: "U"
+            };
+            $.ajax({
+                url: urlPPIC + "/CRUDsurvey",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    getLoad();
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function saveSurvey() {
+            var res = validateSurvey();
+            if (res == false) {
+                return false;
+            }
+
+            var ppicObj = {
+                dateStart: $('#dStart').val(),
+                dateStop: $('#dStop').val(),
+                status: $('#status').val(),
+                ch: "I" 
+            };
+            $.ajax({
+                url: urlPPIC + "/CRUDsurvey",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    getLoad();
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            emptySurvey();
+
+        }
+
+        function emptySurvey() {
+            $('#dStart').val('');
+            $('#dStop').val('');
+            $('#status').val('');
+        }
+
+        function closeSurvey() {
+            $('#SurveyForm').hide();
+            emptySurvey();
+        }
+
+        function validateSurvey() {
+            var isValid = true;
+            if ($('#dStart').val().trim() == "") {
+                $('#dStart').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#dStart').css('border-color', 'lightgrey');
+            }
+
+            if ($('#dStop').val().trim() == "") {
+                $('#dStop').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#dStop').css('border-color', 'lightgrey');
+            }
+
+            if ($('#status').val().trim() == "") {
+                $('#status').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#status').css('border-color', 'lightgrey');
+            }
+
+            return isValid;
+        }
+    </script>
+}

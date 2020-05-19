@@ -1,0 +1,611 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+
+
+
+    .cornersL {
+        border-radius: 15px 5px 1px 1px;
+        background: #73AD21;
+        padding: 5px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .cornersR {
+        border-radius: 5px 15px 1px 1px;
+        background: #73AD21;
+        padding: 5px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .cart {
+        height: 525px;
+        padding: 10px;
+        border: solid 0.5px silver;
+    }
+
+    .cart-tbl {
+        height: 525px;
+        border-radius: 10px;
+        background: #e3f2e4;
+        overflow: auto;
+    }
+
+    .gtext {
+        color: blue;
+        text-shadow: 2px 2px 4px blue;
+        font-size: 110%;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+
+    .modal-dialog {
+        width: 80%;
+        margin: auto;
+    }
+
+    
+</style>
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Machine Down</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Machine Down</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-default btn-block btn-sm" data-toggle="modal" data-target="#myModal" onclick="addDown();"><strong>Add Machine Down</strong></button>
+                        </div>
+                    </div>
+
+
+                    <div class="box-body cart">
+                        <div id="mainform" class="form-horizontal cart-tbl">
+                            <table id="tblMachineDown" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="cornersL" style='color:black; width:10%'>Date Issued</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Code</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Machine Name</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Issue</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Action</th>
+                                        <th bgcolor='#73AD21' style='color:black'>By Who</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Closed Date</th>
+                                        <th bgcolor='#73AD21' style='color:black'>State</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Remark</th>
+                                        <th bgcolor='#73AD21' style='color:black'>Edit</th>
+                                        <th class="cornersR" style='color:black; width:10%'>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodytblMachineDown"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+
+
+        <div id="MachineDownForm" class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title" style="color:red"><strong>Machine Down Form</strong></h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form role="form" enctype="multipart/form-data" id="AchieveInfo" name="AchieveInfo" novalidate>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label for="downID">ID</label>
+                        <input type="text" class="form-control" id="downID" disabled="disabled" />
+                    </div>
+
+
+                    <div class="form-group">
+                        <label  for="dDown">Date Issued:</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input type="text" class="form-control pull-right" id="dDown">
+                        </div>
+                        <!-- /.input group -->
+                    </div>
+
+                    <!-- time Picker -->
+                    <div class="bootstrap-timepicker">
+                        <div class="form-group">
+                            <label>Time Issued:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control timepicker" id="tDown">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                            </div>
+                            <!-- /.input group -->
+                        </div>
+                        <!-- /.form group -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="MachName">Machine Name</label>
+                        <input type="text" class="form-control" id="MachName" name="MachName" placeholder="Machine Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="issue">Issue</label>
+                        <input type="text" class="form-control" id="issue" name="issue" placeholder="Issue" />
+                    </div>
+                    <div class="form-group">
+                        <label for="act">Action</label>
+                        <input type="text" class="form-control" id="act" name="act" placeholder="Action" />
+                    </div>
+                    <div class="form-group">
+                        <label for="who">By Who</label>
+                        <input type="text" class="form-control" id="who" name="who" placeholder="By Who" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dClose">Closed Date:</label>
+                        <div class="input-group date">
+                            <div class="input-group-addon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <input type="text" class="form-control pull-right" id="dClose" placeholder="Closed Date" />
+                        </div>
+                        <!-- /.input group -->
+                    </div>
+
+
+                    <!-- time Picker -->
+                    <div class="bootstrap-timepicker">
+                        <div class="form-group">
+                            <label>Closed Time:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control timepicker" id="tClosed">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                            </div>
+                            <!-- /.input group -->
+                        </div>
+                        <!-- /.form group -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stat">State</label>
+                        <select title="Select Machine Condition" class="form-control" id="stat">
+                            <option>Select...</option>
+                            <option value="1">READY</option>
+                            <option value="2">WARNING</option>
+                            <option value="0">DAMAGE</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rem">Remark</label>
+                        <input type="text" class="form-control" id="rem" name="rem" placeholder="Remark" />
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <input id="btnAdd" type="button" name="add" class="btn btn-primary input-sm" onclick="saveDown();" value="Submit">
+                    <button type="button" class="btn btn-primary" id="btnUpdate" style="display:none;" onclick="UpdateDown();">Update</button>
+                    <button type="submit" class="btn btn-default" onclick="closeDown();">Close</button>
+                </div>
+            </form>
+        </div>
+
+    </section>
+    <!-- /.content -->
+</div>
+<div class="loader"></div>
+
+@section Scripts
+{
+<script>
+    var urlPPIC = "@Url.Content("~/PPIC")";
+    var today = new Date();
+    var dNow;
+    $(document).ready(function () {        
+        $('#dDown').datepicker({
+            autoclose: true, format: 'dd-mm-yyyy'
+        })
+        $('#dClose').datepicker({
+            autoclose: true,  format: 'dd-mm-yyyy'
+        });
+
+        $('.timepicker').timepicker({
+            showInputs: false
+        })
+        var dd = today.getDate();
+        var mm = today.getMonth()+1;
+        var yyyy = today.getFullYear();
+        var mmonth
+        if (mm < 10)
+            mmonth = '0' + mm;
+        else mmonth = mm;
+        dNow = dd + '-' + mmonth + '-' + yyyy;
+        MainLoad();
+        $('#MachineDownForm').hide();
+    })
+
+    function MainLoad() {
+        var tr;
+        var ppicObj = {
+            id: 0,
+            ch: 'A'
+        };
+        $.ajax({
+            url: urlPPIC + "/vMachineDown/",
+            data: JSON.stringify(ppicObj),
+            contentType: "application/json;charset=utf-8",
+            success: function (result) {
+                $.each(result, function (key, item) {
+                    tr = $('<tr/>');
+                    tr.append("<td>" + item.date1 + ' ' + item.time1 + "</td>");
+                    tr.append("<td>" + item.codeForm + "</td>");
+                    tr.append("<td>" + item.name1 + "</td>");
+                    tr.append("<td>" + item.code1 + "</td>");
+                    tr.append("<td>" + item.code2 + "</td>");
+                    tr.append("<td>" + item.name2 + "</td>");
+                    tr.append("<td>" + item.date2 + ' ' + item.time2 + "</td>");
+                    if (item.state == 0)
+                        tr.append('<td> <i class="fa fa-fw fa-close fa-2x" style="color:red"></i></td>');
+                    else if (item.state == 1)
+                        tr.append('<td> <i class="fa fa-fw fa-circle fa-2x" style="color:blue"></i></td>');
+                    else if (item.state == 2)
+                        tr.append('<td> <i class="fa fa-fw fa-exclamation-triangle fa-2x" style="color:orange"></i></td>');
+                    else tr.append('<td></td>');
+                    tr.append("<td>" + item.desc + "</td>");
+                    tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Edit !"     onclick="getDown(' + item.id + ');"><span class="glyphicon glyphicon-pencil" style="color:black"></span></a></td>');
+                    tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Delete !"     onclick="deleteDown(' + item.id + ');"><span class="glyphicon glyphicon-trash" style="color:red"></span></a></td>');
+                    $('#tblMachineDown').append(tr);
+                });
+                $('#tblMachineDown').DataTable({ responsive: true });
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            },
+            beforeSend: function () { $(".loader").show(); },
+            complete: function () { $(".loader").hide(); },
+            type: 'POST', dataType: 'json'
+        });
+    }
+
+    function addDown() {
+        $('#MachineDownForm').show();
+        $('#btnUpdate').hide();
+        $('#btnAdd').show();
+        emptyDown();
+    }
+
+    function getLoad() {
+        var tr;
+        $('#tblMachineDown').DataTable().destroy();
+        $('#tbodytblMachineDown').empty();
+        var ppicObj = {
+            id: 0,
+            ch: 'A'
+        };
+        $.ajax({
+            url: urlPPIC + "/vMachineDown/",
+            data: JSON.stringify(ppicObj),
+            contentType: "application/json;charset=utf-8",
+            success: function (result) {
+                $.each(result, function (key, item) {
+                    tr = $('<tr/>');
+                    tr.append("<td>" + item.date1 + ' ' + item.time1 + "</td>");
+                    tr.append("<td>" + item.codeForm + "</td>");
+                    tr.append("<td>" + item.name1 + "</td>");
+                    tr.append("<td>" + item.code1 + "</td>");
+                    tr.append("<td>" + item.code2 + "</td>");
+                    tr.append("<td>" + item.name2 + "</td>");
+                    tr.append("<td>" + item.date2 + ' ' + item.time2 + "</td>");
+                    if (item.state == 0)
+                        tr.append('<td> <i class="fa fa-fw fa-close fa-2x" style="color:red"></i></td>');
+                    else if (item.state == 1)
+                        tr.append('<td> <i class="fa fa-fw fa-circle fa-2x" style="color:blue"></i></td>');
+                    else if (item.state == 2)
+                        tr.append('<td> <i class="fa fa-fw fa-exclamation-triangle fa-2x" style="color:orange"></i></td>');
+                    else tr.append('<td></td>');
+                    tr.append("<td>" + item.desc + "</td>");
+                    tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Edit !"     onclick="getDown(' + item.id + ');"><span class="glyphicon glyphicon-pencil" style="color:black"></span></a></td>');
+                    tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Delete !"     onclick="deleteDown(' + item.id + ');"><span class="glyphicon glyphicon-trash" style="color:red"></span></a></td>');
+                    $('#tbodytblMachineDown').append(tr);
+                });
+                $('#tblMachineDown').DataTable();
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            },
+            beforeSend: function () { $(".loader").show(); },
+            complete: function () { $(".loader").hide(); },
+            type: 'POST', dataType: 'json'
+        });
+    }
+
+    function getDown(id) {
+        var ppicObj = {
+            id: id,
+            ch: 'B'
+        };
+        $.ajax({
+            url: urlPPIC + "/vMachineDown/",
+            data: JSON.stringify(ppicObj),
+            contentType: "application/json;charset=utf-8",
+            success: function (result) {
+                $.each(result, function (key, item) {
+                    $('#downID').val(item.id);
+                    $('#dDown').val(item.date1);
+                    $('#tDown').val(item.time1);
+                    $('#MachName').val(item.name1);
+                    $('#issue').val(item.code1);
+                    $('#act').val(item.code2);
+                    $('#who').val(item.name2);
+                    $('#dClose').val(item.date2);
+                    $('#tClosed').val(item.time2);
+                    $('#stat').val(item.state);
+                    $('#rem').val(item.desc);
+
+                });
+                $('#MachineDownForm').show();
+                $('#btnUpdate').show();
+                $('#btnAdd').hide();
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+            },
+            beforeSend: function () { $(".loader").show(); },
+            complete: function () { $(".loader").hide(); },
+            type: 'POST', dataType: 'json'
+        });
+
+    }
+
+
+    function UpdateDown() {
+        var res = validateDown();
+        if (res == false) {
+            return false;
+        }
+        var startDate = $('#dDown').val();
+        var startTime = $('#tDown').val();
+        var NewDateDown = startDate + ' ' + startTime;
+        var startDClosed = $('#dClose').val();
+        var startTClosed = $('#tClosed').val();
+        if (startDClosed != '')
+            var NewDateClosed = startDClosed + ' ' + startTClosed;
+
+        if (startDClosed != '') {
+            console.log(NewDateClosed);
+            var ppicObj = {
+                id: $('#downID').val(),
+                date1: NewDateDown,
+                name1: $('#MachName').val(),
+                code1: $('#issue').val(),
+                code2: $('#act').val(),
+                name2: $('#who').val(),
+                date2: NewDateClosed,
+                state: $('#stat').val(),
+                desc: $('#rem').val(),
+                ch: "U"
+            };
+        }
+
+        else
+            var ppicObj = {
+                id: $('#downID').val(),
+                date1: NewDateDown,
+                name1: $('#MachName').val(),
+                code1: $('#issue').val(),
+                code2: $('#act').val(),
+                name2: $('#who').val(),
+                state: $('#stat').val(),
+                desc: $('#rem').val(),
+                ch: "U"
+            };
+
+        $.ajax({
+            url: urlPPIC + "/CRUDMachineDown",
+            data: JSON.stringify(ppicObj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                BootstrapAlert.success({
+                    title: "Message",
+                    message: "Update Machine Down Successfull..."
+                });
+
+                getLoad();
+
+            },
+            error: function (errormessage) {
+                alert(errormessage.responseText);
+                BootstrapAlert.alert({
+                    title: "Message",
+                    message: errormessage.responseText
+                });
+            }
+        });
+    }
+
+    function saveDown() {
+        var res = validateDown();
+        if (res == false) {
+            return false;
+        }
+        var startDate = $('#dDown').val();
+        var startTime = $('#tDown').val();
+        //var NewDateDown = new Date(startDate + ' ' + startTime).toLocaleString("en-US", { timeZone: "Asia/Jakarta" });
+        var NewDateDown = startDate + ' ' + startTime;
+        var startDClosed = $('#dClose').val();
+        var startTClosed = $('#tClosed').val();
+        if (startDClosed != '')
+            var NewDateClosed = startDClosed + ' ' + startTClosed;
+        if (startDClosed != '') {
+            var ppicObj = {
+                id: $('#downID').val(),
+                date1: NewDateDown,
+                name1: $('#MachName').val(),
+                code1: $('#issue').val(),
+                code2: $('#act').val(),
+                name2: $('#who').val(),
+                date2: NewDateClosed,
+                state: $('#stat').val(),
+                desc: $('#rem').val(),
+                ch: "I"
+            };
+        }
+        else
+            var ppicObj = {
+                id: $('#downID').val(),
+                date1: NewDateDown,
+                name1: $('#MachName').val(),
+                code1: $('#issue').val(),
+                code2: $('#act').val(),
+                name2: $('#who').val(),
+                state: $('#stat').val(),
+                desc: $('#rem').val(),
+                ch: "I"
+            };
+
+        $.ajax({
+            url: urlPPIC + "/CRUDMachineDown",
+            data: JSON.stringify(ppicObj),
+            type: "POST",
+            contentType: "application/json;charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                BootstrapAlert.success({
+                    title: "Message",
+                    message: "Add Machine Down Successfull..."
+                });
+                getLoad();
+
+            },
+            error: function (errormessage) {
+                BootstrapAlert.alert({
+                    title: "Message",
+                    message: errormessage.responseText
+                });
+            }
+        });
+        emptyDown();
+    }
+
+    function closeDown() {
+        $('#MachineDownForm').hide();
+        emptyDown();
+    }
+
+    function emptyDown() {
+       
+        $('#dDown').val(dNow);
+        $('#dClose').val('');
+        $('#MachName').val('');
+        $('#issue').val('');
+        $('#act').val('');
+        $('#who').val('');
+        $('#rem').val('');
+        $('#stat').val('');
+    }
+
+    function validateDown() {
+        var isValid = true;
+        if ($('#dDown').val().trim() == "") {
+            $('#dDown').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#dDown').css('border-color', 'lightgrey');
+        }
+
+        if ($('#MachName').val().trim() == "") {
+            $('#MachName').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#MachName').css('border-color', 'lightgrey');
+        }
+
+        if ($('#issue').val().trim() == "") {
+            $('#issue').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#issue').css('border-color', 'lightgrey');
+        }
+
+        if ($('#stat').val().trim() == "") {
+            $('#stat').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#stat').css('border-color', 'lightgrey');
+        }
+
+        return isValid;
+    }
+
+    function deleteDown(id) {
+        var ans = confirm("Are you sure you want to delete this Record?");
+        if (ans) {
+            var ppicObj = {
+                id: id,
+                ch: "D"
+            };
+            $.ajax({
+                url: urlPPIC + "/CRUDMachineDown/",
+                type: "POST",
+                contentType: "application/json;charset=UTF-8",
+                data: JSON.stringify(ppicObj),
+                dataType: "json",
+                success: function (result) {
+                    getLoad();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+    }
+
+</script>
+}

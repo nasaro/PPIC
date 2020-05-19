@@ -1,0 +1,164 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+</style>
+
+@{
+    ViewBag.Title = "Report Delivery to KBM Monthly";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Report PV MR seri# faktur pajak</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Report PV MR seri# faktur pajak</h3>
+
+
+                        <div class="row">
+                            <!-- Date -->
+                            <div class="col-md-1">
+                                <label> Date : </label>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group date datetimepicker">
+                                    <input type="text" class="form-control" id="mydateDelivery" placeholder="Date Value" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                                <!-- /.input group -->
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-default btn-block btn-sm" data-toggle="modal" onclick="viewAgain();"><strong>Preview</strong></button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="mainform" class="form-horizontal">
+                            <table id="toKBM" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#aa80ff' style='color:black'>Date</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>PV#</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>MR#</th>
+                                        <th bgcolor='#aa80ff' style='color:black'><span class='pull-right'>Nominal</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <br />
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+
+</div>
+<div class="loader"></div>
+
+<!-- /.content-wrapper -->
+
+@section Scripts
+{
+    <script>
+
+        var urlPPIC = "@Url.Content("~/PPIC")";
+        $(document).ready(function () {
+            $('#mydateDelivery').datepicker({
+                format: " yyyy", // Notice the Extra space at the beginning
+                viewMode: "years",
+                minViewMode: "years"
+            });
+
+            var today = new Date();
+
+            var yyyy = today.getFullYear();
+            var todayDate =  yyyy;
+
+            $('#mydateDelivery').val(todayDate);
+
+            $(".loader").hide();
+
+            $('#toKBM').DataTable();
+
+
+        })
+
+       
+        function viewAgain() {
+            var ppicObj = {
+                tgl: $('#mydateDelivery').val(),
+                masuk: "TO"
+            };
+            var dataTable = $('#toKBM').DataTable();
+            $.ajax({
+                url: urlPPIC + "/ViewKBMMonthly/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    dataTable.clear();
+                    $.each(result, function (key, item) {
+                        dataTable.row.add([
+                            item.ProductName,
+                            '<span class="pull-right">' + formatNumber(item.Qty) + '</span>',
+                            '<span class="pull-right">' + formatNumber(item.GrossWeight) + '</span>',
+                            '<span class="pull-right">' + formatNumber(item.Total) + '</span>'
+                        ]).draw();
+
+                    });
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+
+        }
+
+
+    </script>
+}

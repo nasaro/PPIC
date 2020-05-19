@@ -1,0 +1,235 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+
+    th, td {
+        font-family: 'Lato', sans-serif;
+        font-size: 10px;
+        font-weight: 100;
+        padding: 5px;
+        text-align: left;
+    }
+
+    .cornersL {
+        border-radius: 15px 5px 1px 1px;
+        background: #73AD21;
+        padding: 5px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .cornersR {
+        border-radius: 5px 15px 1px 1px;
+        background: #73AD21;
+        padding: 5px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .cart {
+        height: 525px;
+        padding: 10px;
+        border: solid 0.5px silver;
+    }
+
+    .cart-tbl {
+        height: 525px;
+        border-radius: 10px;
+        background: #e3f2e4;
+        overflow: auto;
+    }
+
+    .gtext {
+        color: blue;
+        text-shadow: 2px 2px 5px blue;
+        font-size: 150%;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+
+    .modal-dialog {
+        width: 80%;
+        margin: auto;
+    }
+</style>
+@{
+    ViewBag.Title = "printMatReceive";   
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Print Material Receive</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Print Material Receive</h3>
+
+
+                        <div class="row">
+                            <!-- Date -->
+                            <div class="col-md-1">
+                                <label> Date : </label>
+                            </div>
+                            <div class="col-md-3">
+                                @{  var tgl = DateTime.Now;
+                                    <div class="input-group date datetimepicker">
+                                        <input type="text" class="form-control" id="mydateDelivery" placeholder="Date Value" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                      </div>
+                                }
+                                <input type="hidden" value="@Session["codeMMR"]" id="idglobal" />  
+                                <!-- /.input group -->
+
+                            </div>
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-default btn-block btn-sm" data-toggle="modal" onclick="showTables();"><strong>Preview</strong></button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body cart">
+                        <div id="mainform" class="form-horizontal cart-tbl">
+                            <table id="tblRec" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="cornersL" style='color:black; width:40%'><strong>MMRCode</strong></th>
+                                        <th bgcolor='#73AD21' style='color:black; width:30%'><strong>MMRDate</strong></th>
+                                        <th bgcolor='#73AD21' style='color:black; width:20%'><span class='pull-right'><strong>DateDiff</strong></span></th>
+                                        <th class="cornersR" style='color:black'><strong>Action</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodytblRec"></tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <br />
+
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+    <!-- /.content -->
+
+</div>
+
+<div class="loader"></div>
+
+<!-- /.content-wrapper -->
+@section Scripts
+{
+    <script>
+        var urlPPIC = "@Url.Content("~/PPIC")";
+        $(document).ready(function () {
+            $('#mydateDelivery').datepicker({
+                format: "yyyy"
+            });
+
+            var today = new Date();
+
+            var todayDate = today.getFullYear();
+
+            $('#mydateDelivery').val(todayDate);
+            viewAgain();
+        })
+
+        function showTables() {
+            viewAgain();
+        }
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+
+        }
+        
+        function Print(code) {
+            $.ajax({
+                url: urlPPIC + "/passMatReceive/"+code,
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    if (result == 1) {
+                        window.open('../Reports/WebRptForm.aspx');
+                    }
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+        }
+
+        function viewAgain() {
+            var ppicObj = {
+                tgl: $('#mydateDelivery').val()
+            };
+            var tr;
+
+            var dataTable = $('#tblRec').DataTable();
+
+            $.ajax({
+                url: urlPPIC + "/ViewMatReceive/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    dataTable.clear();
+                    $.each(result, function (key, item) {
+                        dataTable.row.add([
+                            '<span class="gtext">' + item.cInvCode + '</span>',
+                            '<span class="gtext">' + item.dMMRDate + '</span>',
+                            '<span class="gtext pull-right">' + formatNumber(item.Qty) + '</span>',
+                            '<a href="javascript:void(0)"  data-toggle="tooltip" title="Print"   onclick="Print(\'' + item.cInvCode + '\');"><i class="glyphicon glyphicon-print" style="color:red"></i></a>'
+                        ]).draw();
+
+                    });
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+    </script>
+}

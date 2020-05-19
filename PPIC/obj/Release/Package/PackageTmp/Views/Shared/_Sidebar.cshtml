@@ -1,0 +1,51 @@
+﻿    <!-- Left side column. contains the logo and sidebar -->
+<aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+        </div>
+        <!-- search form -->
+       
+        <!-- /.search form -->
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <!-- ARRAY MENU   -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <li class="header">MAIN MENU</li>
+
+            @if (Session["MenuMaster"] != null)
+            {
+
+                var MenuMaster = (List<PPIC.Models.MenuModels>)Session["MenuMaster"];
+                var groupByMenu = MenuMaster.GroupBy(x => x.MainMenuName).ToList();
+
+                foreach (var MenuList in groupByMenu)
+                {
+                    <li class="treeview">
+                        <a href="#">
+                            <i class="fa fa-desktop"></i> <span>@MenuList.Key</span>
+                            <span class="pull-right-container">
+                                <i class="fa fa-angle-left pull-right"></i>
+                            </span>
+                        </a>
+                        <ul class="treeview-menu">
+                            @foreach (var SubMenuList in MenuList)
+                            {
+                                var nmMenu = @SubMenuList.SubMenuName;
+                                var nmController = @SubMenuList.ControllerName;
+                                var nmAction = @SubMenuList.ActionName;
+                                //<li class="@Html.IsSelected(action: "OutStandingPO")"><a href="@Url.Action(nmAction, nmController)"><i class="fa fa-circle-o"></i> @nmMenu</a></li>
+                                <li>@Html.ActionLink(nmMenu, nmAction, nmController)</li>
+                            }
+                        </ul>                       
+                    </li>
+                }
+
+            }
+        </ul>
+
+        <!-- END MENU ARRAY-->
+
+    </section>
+    <!-- /.sidebar -->
+</aside>

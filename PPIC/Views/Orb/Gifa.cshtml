@@ -1,0 +1,461 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+    .modal-body {
+        /* cover the modal */
+        left: 10px;      
+        /* spacing as needed */
+        padding: 20px 50px 20px 20px;  
+    }
+
+</style>
+
+@{
+    ViewBag.Title = "Exibition Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>Exibition Form</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">List visitor</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div id="mainform" class="form-horizontal">
+                            <table id="tblGifa" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#53c68c'>Visitor</th>
+                                        <th bgcolor='#53c68c'>Email</th>
+                                        <th bgcolor='#53c68c'>Position</th>
+                                        <th bgcolor='#53c68c'>Company</th>
+                                        <th bgcolor='#53c68c'>Industry</th>
+                                        <th bgcolor='#53c68c'>BusinessType#</th>
+                                        <th bgcolor='#53c68c'>Location</th>
+                                        <th bgcolor='#53c68c'>Detail</th>
+                                        <th bgcolor='#53c68c'>Image</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBodytblGifa"></tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <br />
+
+                    </div>
+                    <!-- /.box-body -->
+                    <hr />
+                </div>
+                <!-- /.box -->
+
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+
+        <div class="modal fade" id="myModalGifa" tabindex="-1" role="dialog" aria-labelledby="myModalLabelGifa" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header alert-success">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabelGifa">Detail</h4>
+                    </div>
+                    <div class="form-horizontal">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <input type="hidden" class="form-control" id="id_gifa" name="id_gifa" disabled="disabled" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Visitor</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="visit" name="visit" disabled="disabled" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Title</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select title="Select Title" class="form-control" id="title" disabled="disabled" >
+                                            <option value="Mr.">Mr.</option>
+                                            <option value="Ms.">Ms.</option>
+                                            <option value="Dr.">Dr.</option>
+                                        </select>                           
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Email</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="email" name="email" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Position</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select title="Select Position" class="form-control" id="posi">
+                                            <option value="President/CEO">President/CEO</option>
+                                            <option value="Vice President">Vice President</option>
+                                            <option value="Director">Director</option>
+                                            <option value="General Manager">General Manager</option>
+                                            <option value="Manager">Manager</option>
+                                            <option value="Staff">Staff</option>
+                                            <option value="Consultant">Consultant</option>
+                                            <option value="Lecturer">Lecturer</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Company</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="comp" name="comp" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Industry</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="ind" name="ind" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Department</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="dept" name="dept" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Country</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="country" name="country" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Contact Status</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select title="Select Contact Status" class="form-control" id="stat">
+                                            <option value="Existing Customer">Existing Customer</option>
+                                            <option value="New Business Contact">New Business Contact</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Business Type</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select title="Select Business Type" class="form-control" id="tipe">
+                                            <option value="Manufacturer">Manufacturer</option>
+                                            <option value="Sourcing/Intermediary">Sourcing/Intermediary</option>
+                                            <option value="Engineering Consultant">Engineering Consultant</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Product Interested In</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select title="Product Interested In" class="form-control" id="inter">
+                                            <option value="Investment Casting">Investment Casting</option>
+                                            <option value="Machining Parts">Machining Parts</option>
+                                            <option value="Sands Casting">Sands Casting</option>
+                                            <option value="Aluminium Die Casting">Aluminium Die Casting</option>
+                                            <option value="Zinc Die Casting">Zinc Die Casting</option>
+                                            <option value="Fabrication Parts">Fabrication Parts</option>
+                                            <option value="Plastic Injection Parts">Plastic Injection Parts</option>
+                                            <option value="Medical Implants">Medical Implants</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" id="oth" name="oth" disabled="disabled" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Visitor Classification</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select title="Select Visitor Classification" class="form-control" id="cls">
+                                            <option value="Very Important">Very Important</option>
+                                            <option value="Important">Important</option>
+                                            <option value="Less Important">Less Important</option>
+                                        </select>
+
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Follow Up</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="foll" name="foll" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>About</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="about" name="about" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Location</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <select title="Select Location" class="form-control" id="loca" disabled="disabled" >
+                                            <option value="New Cast 2019 - Germany">New Cast 2019 - Germany</option>
+                                            <option value="Pump Valve 2019 - Jakarta">Pump Valve 2019 - Jakarta</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" id="btnSaveGifa" onclick="SaveGifa()" data-dismiss="modal">Save</button>
+                            <button type="button" class="btn btn-default" id="btnCloseDo" onclick="closeDo()" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="myModalImage" tabindex="-1" role="dialog" aria-labelledby="myModalLabelImage" aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header alert-danger">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabelImage">Detail</h4>
+                    </div>
+                    <div class="form-horizontal">
+                        <div class="modal-body">
+                            <input type="hidden" class="form-control" id="id_image" name="id_image" disabled="disabled" />
+                            <div id="imgPreview" class="thumbnail">
+                            </div>           
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" id="btnCloseDo" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- /.content -->
+
+</div>
+<div class="loader"></div>
+<!-- /.content-wrapper -->
+
+
+@section Scripts
+{
+    <script>
+        var urlPPIC =  "@Url.Content("~/Orb")";
+        var urlImage = '@Url.Content("http://zenith-dashboard.com/GIFA/Uploads/")';
+        var categoriesPresent = ['Investment Casting', 'Machining Parts', 'Sands Casting', 'Aluminium Die Casting', 'Zinc Die Casting', 'Fabrication Parts', 'Plastic Injection Parts', 'Medical Implants'];
+        $(document).ready(function () {
+            MainLoad();
+
+            $('#inter').change(function () {
+                if ($('#inter').val() == 'Other') {
+                    $("#inter").prop("disabled", true);
+                    $("#oth").prop("disabled", false);
+                } else {
+                    $("#inter").prop("disabled", false);
+                    $("#oth").prop("disabled", true);
+                }
+            });
+        })
+
+        function closeDo() {
+            $("#inter").prop("disabled", false);
+            $("#oth").prop("disabled", true);
+            $("#oth").val('');
+        }
+
+        function MainLoad() {
+
+            var ppicObj = {
+                id: 0,
+                pil: 'A'
+            };
+
+            $('#tblGifa').DataTable().destroy();
+            $('#tBodytblGifa').empty();
+
+            $.ajax({
+                url: urlPPIC + "/GetAllGifa/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td><strong>" + item.visitor + "</strong></td>");
+                        tr.append("<td>" + item.email + "</td>");
+                        tr.append("<td>" + item.position + "</td>");
+                        tr.append("<td>" + item.company + "</td>");
+                        tr.append("<td>" + item.industry + "</td>");
+                        tr.append("<td>" + item.businessType + "</td>");
+                        tr.append("<td>" + item.location + "</td>");
+                        tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Detail" onclick="Detail(' + item.id + ');"><span class="glyphicon glyphicon-user" style="color:red"></span></a></td>');
+                        tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Detail" onclick="Image(\'' + item.nmfile + '\');"><span class="glyphicon glyphicon-picture" style="color:red"></span></a></td>');
+                        $('#tBodytblGifa').append(tr);
+                    });
+                    $('#tblGifa').DataTable().draw();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+            setInterval(MainLoad, 300000); //300000 MS == 5 minutes
+        }
+
+        function Detail(id) {
+            $('#id_gifa').val(id);
+            $('#myModalGifa').modal('show');
+            var ppicObj = {
+                id: id,
+                pil: 'B'
+            };
+
+
+            $.ajax({
+                url: urlPPIC + "/GetAllGifa/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        $('#visit').val(item.visitor);
+                        $('#title').val(item.title);
+                        $('#posi').val(item.position);
+                        $('#email').val(item.email);
+                        $('#comp').val(item.company);
+                        $('#ind').val(item.industry);
+                        $('#dept').val(item.department);
+                        $('#country').val(item.country);
+                        $('#stat').val(item.contactStatus);
+                        $('#tipe').val(item.businessType);
+                        $('#inter').val(item.productInterested);
+                        $('#cls').val(item.visitorClassification);
+                        $('#foll').val(item.followUp);
+                        $('#about').val(item.about);
+                        $('#loca').val(item.location);
+
+                        var foundPresent = $.inArray(item.productInterested, categoriesPresent) > -1;
+                        if (!foundPresent) {
+                            $('#oth').val(item.productInterested);
+                            $('#inter').val('Other');
+                        }
+                    });
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+
+        }
+
+        function Image(nmfile) {
+            $("#imgPreview").empty();
+            var locImage = urlImage + nmfile;
+            var imageRow = '<img src="' + locImage + '" style="width:80%" alt="Card Image" "/>';
+            $(imageRow).appendTo('#imgPreview');
+            $('#myModalImage').modal('show');
+        }
+
+        function SaveGifa() {
+            var strOrth = '';
+            if ($('#inter').val() == 'Other')
+                strOrth = $('#oth').val();
+            else strOrth = $('#inter').val();
+
+            var Gifa = {
+                id: $('#id_gifa').val(),
+                email: $('#email').val(),
+                company: $('#comp').val(),
+                industry: $('#ind').val(),
+                department: $('#dept').val(),
+                country: $('#country').val(),
+                contactStatus: $('#stat').val(),
+                businessType: $('#tipe').val(),
+                productInterested: strOrth,
+                visitorClassification: $('#cls').val(),
+                followUp: $('#foll').val(),
+                about: $('#about').val(),
+                position: $('#posi').val()
+            };
+
+            $.ajax({
+                url: urlPPIC + "/EditGifa/",
+                data: JSON.stringify(Gifa),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+
+                },
+                error: function (errormessage) {
+                    //alert(errormessage.responseText);
+                }
+            });
+
+            MainLoad();
+
+        }
+
+    </script>
+}

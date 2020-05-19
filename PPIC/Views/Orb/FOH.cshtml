@@ -1,0 +1,309 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+
+    .modal-body {
+        /* cover the modal */
+        left: 10px;
+        /* spacing as needed */
+        padding: 20px 50px 20px 20px;
+    }
+</style>
+@{
+    ViewBag.Title = "FOH";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>FOH</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">List FOH</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-1">
+                                <label>Periode</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="input-group date datetimepicker">
+                                    <input type="text" class="form-control" id="dperiode" placeholder="YYYY" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <button id="proc" type="button" class="btn btn-success btn-md" data-toggle="tooltip" title="View" onclick="MainLoad();">Preview</button>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div id="mainform" class="form-horizontal">
+                            <table id="tblFOH" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#53c68c'>KWH</th>
+                                        <th bgcolor='#53c68c'>Date</th>
+                                        <th bgcolor='#53c68c'>Time</th>
+                                        <th bgcolor='#53c68c'>Date Update</th>
+                                        <th bgcolor='#53c68c'>Remark</th>
+                                        <th bgcolor='#53c68c'>Edit</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBodytblFOH"></tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <br />
+
+                    </div>
+                    <!-- /.box-body -->
+                    <hr />
+                </div>
+                <!-- /.box -->
+
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+
+        <div class="modal fade" id="myModalFOH" tabindex="-1" role="dialog" aria-labelledby="myModalLabelFOH" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header alert-success">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabelFOH">Detail</h4>
+                    </div>
+                    <div class="form-horizontal">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <div class="row">
+                                    <input type="hidden" class="form-control" id="id_foh" name="id_foh" disabled="disabled" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>KWH</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="number" class="form-control" id="kwh" name="kwh" disabled="disabled" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Date</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="date" name="date" disabled="disabled" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Time</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="time" name="time" disabled="disabled" />
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label>Update</label>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <input type="text" class="form-control" id="update" name="update" disabled="disabled" />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <label>Remark</label>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="rem" name="rem" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" id="btnSaveGifa" onclick="SaveFOH()" data-dismiss="modal">Save</button>
+                            <button type="button" class="btn btn-default" id="btnCloseDo" onclick="closeDo()" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- /.content -->
+
+</div>
+<div class="loader"></div>
+
+
+@section Scripts
+{
+    <script>
+        var urlPPIC =  "@Url.Content("~/Orb")";
+        $(document).ready(function () {
+            var dNow = new Date();
+            var year = dNow.getFullYear();
+            $('#dperiode').datepicker({
+                format: 'yyyy'
+            });
+            $('#dperiode').val(year);
+            MainLoad();
+        })
+
+        function MainLoad() {
+            var dthn =  $('#dperiode').val();
+            var ppicObj = {
+                id: 0,
+                periode: dthn,
+                pil: 'A'
+            };
+
+            $('#tblFOH').DataTable().destroy();
+            $('#tBodytblFOH').empty();
+
+            $.ajax({
+                url: urlPPIC + "/GetAllFOH/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td><strong>" + item.kwh + "</strong></td>");
+                        tr.append("<td>" + getFormattedDate(item.ddate) + "</td>");
+                        tr.append("<td>" + item.ttime + "</td>");
+                        tr.append("<td>" + item.dupdate + "</td>");
+                        tr.append("<td>" + item.remark + "</td>");
+                        tr.append('<td><a href="javascript:void(0);"  data-toggle="tooltip" title="Detail" onclick="Detail(' + item.id + ');"><span class="glyphicon glyphicon-pencil" style="color:red"></span></a></td>');
+                        $('#tBodytblFOH').append(tr);
+                    });
+                    $('#tblFOH').DataTable().draw();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+            setInterval(MainLoad, 300000); //300000 MS == 5 minutes
+        }
+
+
+        function Detail(id) {
+            $('#id_foh').val(id);
+            $('#myModalFOH').modal('show');
+            var ppicObj = {
+                id: id,
+                periode: 0,
+                pil: 'B'
+            };
+
+
+            $.ajax({
+                url: urlPPIC + "/GetAllFOH/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        $('#kwh').val(item.kwh);
+                        $('#date').val(getFormattedDate(item.ddate));
+                        $('#time').val(item.ttime);
+                        $('#update').val(item.dupdate);
+                        $('#rem').val(item.remark);
+                    });
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+
+        }
+
+
+        function SaveFOH() {
+
+            var FOH = {
+                id: $('#id_foh').val(),
+                kwh: $('#kwh').val(),
+                ddate: $('#date').val(),
+                ttime: $('#time').val(),
+                remark: $('#rem').val()
+            };
+
+            $.ajax({
+                url: urlPPIC + "/EditFOH/",
+                data: JSON.stringify(FOH),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+
+                },
+                error: function (errormessage) {
+                    //alert(errormessage.responseText);
+                }
+            });
+
+            MainLoad();
+
+        }
+
+
+        function closeDo() {
+            $('#rem').val('');
+        }
+
+        function getFormattedDate(stringDate) {
+            var date = new Date(stringDate)
+            var year = date.getFullYear();
+
+            var month = (1 + date.getMonth()).toString();
+            month = month.length > 1 ? month : '0' + month;
+
+            var day = date.getDate().toString();
+            day = day.length > 1 ? day : '0' + day;
+
+            return day + '-' + month + '-' + year;
+        }
+
+    </script>
+}

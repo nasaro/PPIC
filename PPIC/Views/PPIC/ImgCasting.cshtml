@@ -1,0 +1,228 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+
+    .modal-dialog {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+
+    .modal-content {
+      height: auto;
+      overflow-y:auto; /*scroll bar*/
+      min-height: 100%;
+      border-radius: 0;
+    }
+
+   
+
+</style>
+
+@{
+    ViewBag.Title = "PPIC Application";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>PPIC Application</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">PPIC Application</h3>
+                    </div>
+                    <div class="box-body">
+                        <div id="mainform" class="form-horizontal">
+                            <table id="fromKBM" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#aa80ff' style='color:black'>Product Name</th>
+                                        <th bgcolor='#aa80ff' style='color:black'><span class='pull-right'>GrossWeight</span></th>
+                                        <th bgcolor='#aa80ff' style='color:black'>Grade Material#</th>
+                                        <th bgcolor='#aa80ff' style='color:black'>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                        <br />
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+        <div class="modal fade" id="myModalView" tabindex="-1" role="dialog" aria-labelledby="myModalLabelView" aria-hidden="true">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header btn-success">
+                        <button type="button" class="btn btn-primary" onclick="zoomin()"> Zoom In</button>
+                        <button type="button" class="btn btn-danger" onclick="zoomout()"> Zoom Out</button>
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabelView">View Draw Machine </h4>
+                    </div>
+                    <div class="form-horizontal">
+                        <div class="modal-body">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </section>
+    <!-- /.content -->
+
+</div>
+
+<div class="loader"></div>
+
+<!-- /.content-wrapper -->
+@section Scripts
+{
+    <script>
+        var urlPPIC = "@Url.Content("~/PPIC")";
+        $(document).ready(function () {
+            MainLoad();
+        })
+
+        function MainLoad() {
+            var tr;
+            var objtype = {code: 'C'}
+            $.ajax({
+                url: urlPPIC + "/vCastingImage/",
+                data: JSON.stringify(objtype),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td>" + item.ProductName + "</td>");
+                        tr.append("<td><span class='pull-right'>" + item.GrossWeight + "</span></td>");
+                        tr.append("<td>" + item.FinishingCode + "</td>");
+                        if (item.measureName === '') {
+                            tr.append('<td></td>');
+                        }
+                        else {
+                            tr.append('<td><button type="submit" class="btn-sm" data-toggle="tooltip" title="Image!"   onclick="Image( \'' + item.measureName + '\');"><i class="glyphicon glyphicon-picture" style="color:#002699"></i></button></td>');
+                        }
+                        $('#fromKBM').append(tr);
+                    });
+
+                    $('#fromKBM').DataTable({
+
+                        dom: 'Bfrtip',
+                        lengthMenu: [
+                                [10, 25, 50, -1],
+                                ['10 rows', '25 rows', '50 rows', 'Show all']
+                        ],
+                        buttons: ['pageLength', {
+                            extend: 'excel',
+                            text: 'Export to Excel(All)',
+                            exportOptions: {
+                                modifier: {
+                                    // DataTables core
+                                    order: 'index',  // 'current', 'applied', 'index',  'original'
+                                    page: 'all',      // 'all',     'current'
+                                    search: 'none'     // 'none',    'applied', 'removed'
+                                }
+                            }
+                        }, {
+                            extend: 'excel',
+                            text: 'Export to Excel(Part)',
+                            exportOptions: {
+                                modifier: {
+                                    // DataTables core
+                                    order: 'index',  // 'current', 'applied', 'index',  'original'
+                                    page: 'current',      // 'all',     'current'
+                                    search: 'applied'     // 'none',    'applied', 'removed'
+                                }
+                            }
+                        },
+
+                        ],
+                    });
+
+
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function Image(nmfile) {
+            var locImage = '/PPIC/UploadFile/' + nmfile;
+            $("#myModalView .modal-body").html('<img id="map" src="' + locImage + '" />');
+
+            $('#myModalView').modal('show');
+        }
+
+        function zoomin() {
+            var myImg = document.getElementById("map");
+            var currWidth = myImg.clientWidth;
+            var currHeight = myImg.clientHeight;
+            if (currWidth == 2500) return false;
+            else {
+                myImg.style.width = (currWidth + 100) + "px";
+            }
+        }
+
+        function zoomout() {
+            var myImg = document.getElementById("map");
+            var currWidth = myImg.clientWidth;
+            var currHeight = myImg.clientHeight;
+            if (currWidth == 100) return false;
+            else {
+                myImg.style.width = (currWidth - 100) + "px";
+            }
+        }
+        /*
+        function zoomin() {
+            var Page = document.getElementById('map');
+            var zoom = parseInt(Page.style.zoom) + 10 + '%'
+            Page.style.zoom = zoom;
+            return false;
+        }
+
+        function zoomout() {
+            var Page = document.getElementById('map');
+            var zoom = parseInt(Page.style.zoom) - 10 + '%'
+            Page.style.zoom = zoom;
+            return false;
+        }
+        */
+    </script>
+}

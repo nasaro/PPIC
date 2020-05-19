@@ -1,0 +1,598 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+    
+    th, td {
+      font-family: 'Lato', sans-serif;
+      font-size: 10px;
+      font-weight: 100;
+      padding: 5px;
+      text-align: left;
+   }
+    /**   hide coloumn 4 datatable   --- **/    
+    table#tblPor tr th:nth-child(4), table#tblPor tr td:nth-child(4){
+        display:none;
+    }
+   
+
+   .cornersL {
+    border-radius: 15px 5px 1px 1px;
+    background: #73AD21;
+    padding: 5px; 
+    width: 10px;
+    height: 10px;    
+    }
+    .cornersR {
+    border-radius: 5px 15px 1px 1px;
+    background: #73AD21;
+    padding: 5px; 
+    width: 10px;
+    height: 10px;    
+    }
+
+    .cart {
+        height: 525px;
+        padding: 10px;
+        border: solid 0.5px silver;
+    }
+
+    .cart-tbl {
+        height: 525px;
+        border-radius: 10px;
+        background: #e3f2e4;
+        overflow: auto;
+     }
+     
+    .gtext {
+        color: blue;
+        text-shadow: 2px 2px 5px blue;
+        font-size: 100%;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+
+    .modal-dialog{
+       width: 80%;
+       margin: auto;
+    }
+
+</style>
+
+@{
+    ViewBag.Title = "PPIC Application";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>POR</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title" style="color:blue">POR</h3>
+                    </div>
+                    <div class="box-body cart">
+                        <div id="mainform" class="form-horizontal cart-tbl">
+                            <table id="tblPor" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th class="cornersL"  style='color:black'>POR#</th>
+                                        <th bgcolor='#73AD21' style='color:black; width:5%'><span class='pull-right'>QTY POR</span></th>
+                                        <th bgcolor='#73AD21' style='color:black; width:5%'><span class='pull-right'>ID</span></th>
+                                        <th bgcolor='#73AD21' style='color:black; width:1%'><span class='pull-right'>QTY POR2</span></th>
+                                        <th class="cornersR" style='color:black; width:60%'>PRODUCT NAME</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodytblPor"></tbody>
+                            </table>
+                        </div>
+                        <br />
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+                <!-- /.box -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+        <!-- not use  <th class="cornersR" style='color:black'>Edit</th> -->
+        <div id="DetailForm" class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title" style="color:red"><strong>Detail</strong></h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body cart">
+                <div id="detailBox" class="form-horizontal cart-tbl">
+                    <table id="tblDetailPor" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th class="cornersL" style='color:black; width:30%'>REMARK</th>
+                                <th bgcolor='#73AD21' style='color:black; width:15%'>DATE</th>
+                                <th bgcolor='#73AD21' style='color:black; width:15%'><span class='pull-right'>QTY</span></th>
+                                <th bgcolor='#73AD21' style='color:black'>MACHINE</th>
+                                <th class='cornersR' style='color:black'>Schedule</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodytblDetailPor"></tbody>
+                    </table>
+                </div>
+                <br />
+            </div>
+            <!-- /.box-body -->
+
+        </div>
+        <!-- /.box -->
+        <!-- Form Element sizes -->
+
+        <div class="modal fade" id="myModalAddDetail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header alert-danger">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabel3">Edit POR</h4>
+                        <h5 class="modal-title" id="myModalLabel4"></h5>
+                        <h5 class="modal-title" id="myModalLabel5"></h5>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <div class="input-group date datetimepicker">
+                                    <label for="dPOR">POR Date</label>                                    
+                                    <input type="text" class="form-control" id="dPOR" placeholder="POR Date" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="qty">Quantity</label>
+                                <input type="number" class="form-control" id="qty" placeholder="Quantity" />
+                                <input type="hidden" class="form-control" id="idpor" />
+                                <input type="hidden" class="form-control" id="porcode" />
+                                <input type="hidden" class="form-control" id="prodcode" />
+                            </div>
+                            <div class="form-group">
+                                <label for="cbMachine">Machine</label>
+                                <select class="form-control" id="cbMachine"></select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="btnAddDtl" data-dismiss="modal">Save</button>
+                        <button type="button" class="btn btn-primary" id="btnUpdateDtl" style="display:none;" onclick="editDetailModal();">Update</button>
+                        <button type="button" class="btn btn-default" id="btnClosedtl" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>  <!-- /.myModalAddDetail --> 
+
+        <div class="modal fade" id="myModalSchedule" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header alert-danger">
+                        <button type="button" class="close" data-dismiss="modal">×</button>
+                        <h4 class="modal-title" id="myModalLabel3">Add POR</h4>
+                        <h5 class="modal-title" id="myModalLabel4"></h5>
+                        <h5 class="modal-title" id="myModalLabel5"></h5>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <input type="hidden" class="form-control" id="porcodeForm" />
+                            <input type="hidden" class="form-control" id="prodcodeForm" />
+                            <div class="cart">
+                                <div id="detailBoxSchedule" class="form-horizontal cart-tbl">
+                                        <table id="tblDetailSchedule" class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th class="cornersL" style='color:black; width:5%'>ID</th>
+                                                    <th bgcolor='#73AD21' style='color:black; width:20%'>Machine</th>
+                                                    <th bgcolor='#73AD21' style='color:black; width:8%' >Day 1</th>
+                                                    <th bgcolor='#73AD21' style='color:black; width:8%'>Day 2</th>
+                                                    <th bgcolor='#73AD21' style='color:black; width:8%'>Day 3</th>
+                                                    <th bgcolor='#73AD21' style='color:black; width:8%'>Day 4</th>
+                                                    <th bgcolor='#73AD21' style='color:black; width:8%'>Day 5</th>
+                                                    <th bgcolor='#73AD21' style='color:black; width:8%'>Day 6</th>
+                                                    <th class="cornersR"  style='color:black; width:15%'>Day 7</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tbodytblDetailSchedule">
+                                            </tbody>
+                                        </table>
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            <label for="qtyForm">Quantity :</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <input type="hidden" id="qtyvalid" disabled="disabled" />
+                                            <input type="number" class="form-control" id="qtyForm" placeholder="Please Quantity" />
+                                        </div>
+                                    </div>                                    
+                                </div>
+                                <br />
+                            </div>
+                            <!-- /.box-body -->                        
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id="btnCloseSchedule" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>  <!-- /.myModalSchedule --> 
+
+
+    </section>
+    <!-- /.content -->
+
+</div>
+
+<div class="loader"></div>
+
+<!-- /.content-wrapper -->
+@section Scripts
+{
+    <script>
+        var urlPPIC = "@Url.Content("~/PPIC")";
+        $(document).ready(function () {
+            $('#dPOR').datepicker({
+                format: "dd-mm-yyyy"
+            });
+
+            //loadMachine();
+            MainLoad();
+        })
+
+        function MainLoad() {
+            var tr;
+            $.ajax({
+                url: urlPPIC + "/getViewPOR/",
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td class='gtext'>" + item.Name + "</td>");
+                        tr.append("<td><span class='pull-right'>" + formatNumber(item.calibrate) + "</span></td>");
+                        tr.append("<td>" + item.ID + "</td>");
+                        tr.append("<td>" + item.calibrate + "</td>");
+                        tr.append("<td class='gtext'>" + item.NameTools + "</td>");
+                        $('#tblPor').append(tr);
+                    });
+                    var masterTable = $('#tblPor').DataTable();
+                    $('#tblPor tbody').on('click', 'tr', function () {
+                        var data = masterTable.row(this).data();
+                        addDetailGenerate(data[2], data[0], data[4], data[3]);
+                    });
+
+   
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function loadMachine(idprod) {
+            $.ajax({
+                url: urlPPIC + "/ViewMachineFilter/" + idprod,
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    var html = '';
+                    $.each(result, function (key, item) {
+                        html += '<option value=' + item.ID + '>' + item.Name + '</option>';
+                    });
+                    $('#cbMachine').html(html);
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+      
+        function addDetailGenerate(idprod, por, nmprd, qty) {         
+            //--------penyebab <span class='pull-right'> tidak bisa diambil langsung nilai di tabel maka dibuat 2 coloumn
+            $('#qtyvalid').val(qty);
+            var ppicObj = {
+                IDProd: idprod,
+                por: por,
+                type: 'LINK'
+            };
+            loadMachine(idprod);
+            $.ajax({
+                url: urlPPIC + "/CrudPOR",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    /*---if (result < 0) { alert('Fail For Inserted');}---*/
+                    getLoad(idprod, por);
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+            //emptyPOR();
+        }
+
+        //-------- tidak usah edit  tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Add Machine"   onclick="editDetail(' + item.ID + "," + item.IDProd + ",\'" + item.NameProd + "\',\'" + item.por + "\',\'" + item.dPOR + "\'," + item.qty + "," + item.IDMachine + ');"><i class="glyphicon glyphicon-pencil" style="color:red"></i></a></td>');
+
+        function getLoad(idprod, por) {
+            var tr;
+            var ppicObj = {
+                prodcode: idprod,
+                porcode: por
+            };
+            $('#tbodytblDetailPor').empty();
+            $.ajax({
+                url: urlPPIC + "/showPOR/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td><strong>" + item.remark + "</strong></td>");
+                        tr.append("<td><strong>" + item.dPOR + "</strong></td>");
+                        tr.append("<td><span class='pull-right'>" + formatNumber(item.qty) + "</span></td>");
+                        tr.append("<td><strong>" + item.NameMachine + "</strong></td>");
+                        if (item.qty == 0) {
+                            tr.append('<td><a href="javascript:void(0)"  data-toggle="tooltip" title="Schedule"   onclick="addScheduleGenerate(' + item.ID + "," + item.IDCTQ + "," + item.IDProd + ",\'" + item.por + '\');"><i class="glyphicon glyphicon-calendar" style="color:blue"></i></a></td>');
+                        }
+                        $('#tbodytblDetailPor').append(tr);
+                    });
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function addScheduleGenerate(idpor, id, idprod, porcode) {
+            $('#porcodeForm').val(porcode);
+            $('#prodcodeForm').val(idprod);
+            $('#qtyForm').val('');
+            $('#tbodytblDetailSchedule').empty();
+            $.ajax({
+                url: urlPPIC + "/ViewMachineFilter/" + id,
+                type: "GET",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide(); },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td>" + item.idmesin + "</td>");
+                        tr.append("<td>" + item.mesin + "</td>");
+                        if (item.status1 == 1) 
+                            tr.append("<td><button type='button' class='btn btn-primary btn-xs' data-dismiss='modal'  onclick='test(" + idpor + "," + item.idmesin + ",\"" + item.day1 + "\")'>" + item.day1 + "</button></td>");
+                        else
+                            tr.append("<td>" + item.day1 + "</td>");
+
+                        if (item.status2 == 1)
+                            tr.append("<td><button type='button' class='btn btn-primary btn-xs' data-dismiss='modal'  onclick='test(" + idpor + "," + item.idmesin + ",\"" + item.day2 + "\")'>" + item.day2 + "</button></td>");
+                        else
+                            tr.append("<td>" + item.day2 + "</td>");
+
+                        if (item.status3 == 1)
+                            tr.append("<td><button type='button' class='btn btn-primary btn-xs' data-dismiss='modal'  onclick='test(" + idpor + "," + item.idmesin + ",\"" + item.day3 + "\")'>" + item.day3 + "</button></td>");
+                        else
+                            tr.append("<td>" + item.day3 + "</td>");
+
+                        if (item.status4 == 1)
+                            tr.append("<td><button type='button' class='btn btn-primary btn-xs' data-dismiss='modal'  onclick='test(" + idpor + "," + item.idmesin + ",\"" + item.day4 + "\")'>" + item.day4 + "</button></td>");
+                        else
+                            tr.append("<td>" + item.day4 + "</td>");
+
+                        if (item.status5 == 1)
+                            tr.append("<td><button type='button' class='btn btn-primary btn-xs' data-dismiss='modal'  onclick='test(" + idpor + "," + item.idmesin + ",\"" + item.day5 + "\")'>" + item.day5 + "</button></td>");
+                        else
+                            tr.append("<td>" + item.day5 + "</td>");
+
+                        if (item.status6 == 1)
+                            tr.append("<td><button type='button' class='btn btn-primary btn-xs' data-dismiss='modal'  onclick='test(" + idpor + "," + item.idmesin + ",\"" + item.day6 + "\")'>" + item.day6 + "</button></td>");
+                        else
+                            tr.append("<td>" + item.day6 + "</td>");
+
+                        if (item.status7 == 1)
+                            tr.append("<td><button type='button' class='btn btn-primary btn-xs' data-dismiss='modal'  onclick='test(" + idpor + "," + item.idmesin + ",\"" + item.day7 + "\")'>" + item.day7 + "</button></td>");
+                        else
+                            tr.append("<td>" + item.day7 + "</td>");
+
+
+                        $('#tbodytblDetailSchedule').append(tr);
+                    });
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+            $('#myModalSchedule').modal('show');
+        }
+
+        function test(id,idmesin, tgl) {
+            var res = validateAddPOR();
+            var por = $('#porcodeForm').val();
+            var idprod = $('#prodcodeForm').val();
+            var ichkvalid = parseInt($('#qtyvalid').val());
+            var iqtyvalid = parseInt($('#qtyForm').val());
+
+            if (res == false) {
+                alert('Not empty for Quantity');
+                return false;
+            }
+            if (iqtyvalid > ichkvalid) {
+                alert('Greater than Quantity of POR');
+                return false;
+            } else {
+                var ppicObj = {
+                    ID: id,
+                    IDMachine: idmesin,
+                    dPOR: tgl,
+                    qty: iqtyvalid,
+                    type: 'EDIT'
+                };
+                
+                $.ajax({
+                    url: urlPPIC + "/CrudPOR",
+                    data: JSON.stringify(ppicObj),
+                    type: "POST",
+                    contentType: "application/json;charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        getLoad(idprod, por);
+
+                    },
+                    error: function (errormessage) {
+                        alert(errormessage.responseText);
+                    }
+                });
+
+            }
+        }
+
+        function validateAddPOR() {
+            var isValid = true;
+
+            if ($('#qtyForm').val().trim() == "") {
+                $('#qtyForm').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#qtyForm').css('border-color', 'lightgrey');
+            }
+
+            return isValid;
+        }
+
+        function editDetail(id, idprod, nmprd, por, datepor, qty, idmesin) {
+            $('#myModalLabel4').text('POR#:' + por);
+            $('#myModalLabel5').text('Product:' + nmprd);
+            $('#porcode').val(por);
+            $('#prodcode').val(idprod);
+            $('#idpor').val(id);
+            $('#cbMachine').val(idmesin);
+            $('#dPOR').val(datepor);
+            $('#qty').val(qty);
+            $('#myModalAddDetail').modal('show');
+            $('#btnUpdateDtl').show();
+            $('#btnAddDtl').hide();
+        }
+
+        function editDetailModal() {
+            var res = validatePOR();
+            var por = $('#porcode').val();
+            var idprod = $('#prodcode').val();
+
+            if (res == false) {
+                alert('Not empty for Entry');
+                return false;
+            }
+            var ppicObj = {
+                ID: $('#idpor').val(),
+                IDMachine: $('#cbMachine').val(),
+                dPOR: $('#dPOR').val(),
+                qty: $('#qty').val(),
+                type: 'EDIT'
+            };
+            $.ajax({
+                url: urlPPIC + "/CrudPOR",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    $('#myModalAddDetail').modal('hide');
+                    getLoad(idprod, por);
+
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });       
+            //emptyPOR();
+        }
+
+
+        function validatePOR() {
+            var isValid = true;
+            /*-----------
+            if ($('#cbMachine').val() === null) {
+                $('#cbMachine').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#cbMachine').css('border-color', 'lightgrey');
+            }
+
+
+            if ($('#dPOR').val().trim() == "") {
+                $('#dPOR').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#dPOR').css('border-color', 'lightgrey');
+            }
+            -------------*/
+
+            if ($('#qty').val().trim() == "") {
+                $('#qty').css('border-color', 'Red');
+                isValid = false;
+            }
+            else {
+                $('#qty').css('border-color', 'lightgrey');
+            }
+
+            return isValid;
+        }
+
+
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+
+        }
+
+        /*---function emptyPOR() {
+            $('#dPOR').val('');
+            $('#qty').val('');
+            $('#cbMachine').val('');
+        }--*/
+
+    </script>
+}

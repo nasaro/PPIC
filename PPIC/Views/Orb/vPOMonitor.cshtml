@@ -1,0 +1,196 @@
+﻿<style>
+    .loader {
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background: url('/Content/Images/pageLoader.gif') 50% 50% no-repeat rgb(249,249,249);
+        opacity: .8;
+    }
+
+    .modal-body {
+        /* cover the modal */
+        left: 10px;
+        /* spacing as needed */
+        padding: 20px 50px 20px 20px;
+    }
+</style>
+@{
+    ViewBag.Title = "PO Delivery Monitoring";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <h1>
+            Dashboard
+            <small>PO Delivery Monitoring</small>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Dashboard</li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">List PO Delivery Monitoring</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-1">
+                                <label for="bln">Month</label>
+                            </div>
+                            <div class="col-sm-4">
+                                <select class="form-control" id="bln">
+                                    <option value="1">JANUARY</option>
+                                    <option value="2">FEBRUARY</option>
+                                    <option value="3">MARCH</option>
+                                    <option value="4">APRIL</option>
+                                    <option value="5">MAY</option>
+                                    <option value="6">JUNE</option>
+                                    <option value="7">JULY</option>
+                                    <option value="8">AUGUSTUS</option>
+                                    <option value="9">SEPTEMBER</option>
+                                    <option value="10">OCTOBER</option>
+                                    <option value="11">NOVEMBER</option>
+                                    <option value="12">DECEMBER</option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4">
+                                <button id="proc" type="button" class="btn btn-success btn-md" data-toggle="tooltip" title="View" onclick="MainLoad();">Preview</button>
+                            </div>
+                        </div>
+                        <hr />
+                        <div id="mainform" class="form-horizontal">
+                            <table id="tblPO" class="table table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th bgcolor='#53c68c'>PO#</th>
+                                        <th bgcolor='#53c68c'>Inv Name</th>
+                                        <th bgcolor='#53c68c'><span class='pull-right'> Qty PO </span></th>
+                                        <th bgcolor='#53c68c'>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBodytblPO"></tbody>
+                                <tfoot>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <br />
+
+                    </div>
+                    <!-- /.box-body -->
+                    <hr />
+                </div>
+                <!-- /.box -->
+
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+
+    </section>
+
+
+    <!-- /.content -->
+
+</div>
+<div class="loader"></div>
+
+
+@section Scripts
+{
+    <script>
+        var urlPPIC =  "@Url.Content("~/Orb")";
+        $(document).ready(function () {
+            var dNow = new Date()
+            var iMonth = dNow.getMonth() + 1
+            $('#bln').val(iMonth);
+            MainLoad();
+        })
+
+        function MainLoad() {
+            var ppicObj = {
+                id:  $('#bln').val()
+            };
+
+            $('#tblPO').DataTable().destroy();
+            $('#tBodytblPO').empty();
+
+            $.ajax({
+                url: urlPPIC + "/GetAllPODeliveryMonitor/",
+                data: JSON.stringify(ppicObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                beforeSend: function () { $(".loader").show(); },
+                complete: function () { $(".loader").hide();; },
+                dataType: "json",
+                success: function (result) {
+                    $.each(result, function (key, item) {
+                        tr = $('<tr/>');
+                        tr.append("<td><strong>" + item.CPO + "</strong></td>");
+                        tr.append("<td>" + item.invname + "</td>");
+                        tr.append("<td><span class='pull-right'>" + formatNumber(item.qtyPO) + "</span></td>");
+                        tr.append("<td>" + item.ddate + "</td>");
+                        $('#tBodytblPO').append(tr);
+                    });
+                    $('#tblPO').DataTable({
+
+                        dom: 'Bfrtip',
+                        lengthMenu: [
+                                [10, 25, 50, -1],
+                                ['10 rows', '25 rows', '50 rows', 'Show all']
+                        ],
+                        buttons: ['pageLength', {
+                            extend: 'excel',
+                            text: 'Export to Excel(All)',
+                            exportOptions: {
+                                modifier: {
+                                    // DataTables core
+                                    order: 'index',  // 'current', 'applied', 'index',  'original'
+                                    page: 'all',      // 'all',     'current'
+                                    search: 'none'     // 'none',    'applied', 'removed'
+                                }
+                            }
+                        }, {
+                            extend: 'excel',
+                            text: 'Export to Excel(Part)',
+                            exportOptions: {
+                                modifier: {
+                                    // DataTables core
+                                    order: 'index',  // 'current', 'applied', 'index',  'original'
+                                    page: 'current',      // 'all',     'current'
+                                    search: 'applied'     // 'none',    'applied', 'removed'
+                                }
+                            }
+                        },
+
+                        ],
+                    }).draw();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+
+            setInterval(MainLoad, 300000); //300000 MS == 5 minutes
+        }
+
+
+
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+        }
+
+
+    </script>
+}
